@@ -1,0 +1,29 @@
+{
+  "license": "MIT",
+  "keywords": [
+    "AWS",
+    "Syncano",
+    "rekognition",
+    "face-auth"
+  ],
+  "scripts": {
+    "test": "cross-env NODE_ENV=test mocha --compilers js:babel-core/register ./test/**/*.test.js --timeout 10000"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.148.0",
+    "syncano-server": "beta"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-eslint": "^8.0.2",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-register": "^6.26.0",
+    "chai": "^4.1.2",
+    "eslint": "^4.10.0",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-import": "^2.8.0",
+    "mocha": "^4.0.1",
+    "syncano-test": "^0.3.3"
+  }
+}
