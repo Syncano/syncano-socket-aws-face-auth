@@ -1,0 +1,153 @@
+name: syncano-socket-aws-face-auth
+description: Description of syncano-socket-aws-face-auth
+version: 0.0.1
+keywords:
+  - user
+  - face-auth
+  - auth
+  - authentication
+  - register
+config:
+  AWS_REGION:
+    description: AWS region
+    required: true
+  AWS_SECRET_ACCESS_KEY:
+    description: AWS secret access key
+    long_description: |
+      Visit link to know more about managing keys
+      (http://docs.aws.amazon.com/general/latest/gr/managing-aws-access-keys.html).
+    required: true
+  AWS_ACCESS_KEY_ID:
+    description: AWS access key id
+    long_description: |
+      Visit link to know more about managing keys
+      (http://docs.aws.amazon.com/general/latest/gr/managing-aws-access-keys.html).
+    required: true
+
+endpoints:
+  create_collection:
+    description: Creates a collection in an AWS Region
+    parameters:
+      collectionId:
+        type: string
+        description: "ID for the collection that you are creating"
+        example: "SyncanoFaces"
+    response:
+      mimetype: application/json
+      examples:
+        -
+          exit_code: 200
+          description: Success
+          example: |
+            {
+            "collectionArn": "12345",
+            "statusCode": 200
+            }
+        -
+          exit_code: 400
+          description: Failed
+          example: |
+            {
+              "statusCode": 400,
+              "code": "ResourceAlreadyExistsException",
+              "message":"A collection with the specified ID already exists."
+            }
+  delete_collection:
+    description: Deletes a collection in an AWS Region
+    parameters:
+      collectionId:
+        type: string
+        description: "ID of the collection to delete"
+        example: "SyncanoFaces"
+    response:
+      mimetype: application/json
+      examples:
+        -
+          exit_code: 200
+          description: Success
+          example: |
+            {
+            "statusCode": 200
+            }
+        -
+          exit_code: 400
+          description: Failed
+          example: |
+            {
+              "statusCode": 400,
+              "code": "AccessDeniedException",
+              "message":"You are not authorized to perform the action."
+            }
+  face_register:
+    description: |
+      For a given input image search the specified collection for matching faces
+      if no match found Detects faces in the input image and add them to the
+      specified collection.
+    parameters:
+      collectionId:
+        type: string
+        description: "ID of the collection to delete"
+        example: "SyncanoFaces"
+      image:
+        type: Object|Buffer
+        description: "Image as base64-encoded bytes or an S3 object"
+      bucketName:
+        type: string
+        description: "Name of s3 bucket(optional)"
+        example: "SyncanoFaces"
+    response:
+      mimetype: application/json
+      examples:
+        -
+          exit_code: 200
+          description: Success
+          example: |
+            {
+            "statusCode": 200,
+            "newUserId": "12345",
+            }
+        -
+          exit_code: 400
+          description: Failed
+          example: |
+            {
+              "statusCode": 400,
+              "code": "InvalidImageFormatException",
+              "message":"The provided image format is not supported."
+            }
+  face_login:
+    description: |
+      For a given input image search the specified collection for
+      matching faces and return the userId if match found
+    parameters:
+      collectionId:
+        type: string
+        description: "ID of the collection to delete"
+        example: "SyncanoFaces"
+      image:
+        type: Object|Buffer
+        description: "Image as base64-encoded bytes or an S3 object"
+      bucketName:
+        type: string
+        description: "Name of s3 bucket(optional)"
+        example: "SyncanoFaces"
+    response:
+      mimetype: application/json
+      examples:
+        -
+          exit_code: 200
+          description: Success
+          example: |
+            {
+            "statusCode": 200,
+            "userId": "12345",
+            }
+        -
+          exit_code: 400
+          description: Failed
+          example: |
+            {
+              "statusCode": 400,
+              "code": "InvalidImageFormatException",
+              "message":"The provided image format is not supported."
+            }
