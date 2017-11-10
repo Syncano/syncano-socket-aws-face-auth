@@ -11,7 +11,8 @@
   },
   "dependencies": {
     "aws-sdk": "^2.148.0",
-    "syncano-server": "beta"
+    "syncano-server": "beta",
+    "uuid": "^3.1.0"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
@@ -20,6 +21,7 @@
     "babel-preset-env": "^1.6.1",
     "babel-register": "^6.26.0",
     "chai": "^4.1.2",
+    "dotenv": "^4.0.0",
     "eslint": "^4.10.0",
     "eslint-config-airbnb-base": "^12.1.0",
     "eslint-plugin-import": "^2.8.0",

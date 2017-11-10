@@ -53,7 +53,7 @@ class Rekognition {
       : {
         S3Object: {
           Bucket: bucket,
-          Name: image.key
+          Name: image
         }
       };
   }
@@ -86,9 +86,8 @@ class Rekognition {
   }
 
   /**
-   * Deletes a collection
+   * List collections
    *
-   * @param {string} collectionId
    * @returns {Promise} object response
    */
   listCollections() {
@@ -100,15 +99,18 @@ class Rekognition {
    *
    * @param {string} collectionId
    * @param {Object|Buffer} image
+   * @param {?string} externalImageId
    * @param {?string} bucket
    * @returns {Promise} object response
    */
-  indexFaces(collectionId, image, bucket = null) {
+  indexFaces(collectionId, image, externalImageId = null, bucket = null) {
     const params = {
       CollectionId: collectionId,
       Image: Rekognition.getImageParams(image, bucket)
     };
-
+    if (externalImageId) {
+      params.ExternalImageId = externalImageId;
+    }
     return this.doCall('indexFaces', params);
   }
 
@@ -117,8 +119,8 @@ class Rekognition {
    *
    * @param {string} collectionId
    * @param {Object|Buffer} image
-   * @param {number} threshold
    * @param {?string} bucket
+   * @param {number} threshold
    * @returns {Promise} object response
    */
   searchFacesByImage(collectionId, image, bucket = null, threshold = 90) {
