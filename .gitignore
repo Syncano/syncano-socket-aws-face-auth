@@ -1,6 +1,7 @@
 .idea/
 .dist/
 node_modules
+.env
 **/scripts/.bundles
 **/.DS_Store
 .DS_STORE
