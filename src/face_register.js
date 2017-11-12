@@ -42,7 +42,7 @@ export default (ctx) => {
       }, 201);
     })
     .catch((err) => {
-      return response.json({
+      response.json({
         statusCode: err.statusCode,
         code: err.code,
         message: err.message
