@@ -89,11 +89,11 @@ endpoints:
         description: "ID of the collection to delete"
         example: "SyncanoFaces"
       image:
-        type: string|Buffer
-        description: "Image as base64-encoded bytes or an S3 object key"
+        type: string
+        description: "Path to image or an S3 object key"
       bucketName:
         type: string
-        description: "Name of s3 bucket. Make null if image is base64-encoded bytes."
+        description: "Name of s3 bucket. Make null if image not on s3 bucket."
     response:
       mimetype: application/json
       examples:
@@ -124,11 +124,11 @@ endpoints:
         description: "ID of the collection to delete"
         example: "SyncanoFaces"
       image:
-        type: string|Buffer
-        description: "Image as base64-encoded bytes or an S3 object key"
+        type: string
+        description: "Path to image or an S3 object key"
       bucketName:
         type: string
-        description: "Name of s3 bucket. Make null if image is base64-encoded bytes."
+        description: "Name of s3 bucket. Make null if image not on s3 bucket."
     response:
       mimetype: application/json
       examples:

@@ -1,4 +1,5 @@
 import AWS from 'aws-sdk';
+import fs from 'fs';
 
 /**
  * Rekognition Class
@@ -41,20 +42,21 @@ class Rekognition {
   /**
    * Utility to get image params for s3 object or Bytes
    *
-   * @param {Object|Buffer} image
+   * @param {string} image
    * @param {?string} bucket
    * @returns {Object} image params for Rekognition
    */
   static getImageParams(image, bucket) {
-    return image instanceof Buffer && bucket === null
+    return bucket !== null
       ? {
-        Bytes: image
-      }
-      : {
         S3Object: {
           Bucket: bucket,
           Name: image
         }
+      }
+      :
+      {
+        Bytes: fs.readFileSync(image)
       };
   }
 
@@ -98,7 +100,7 @@ class Rekognition {
    * Detects faces in the input image and adds them to the specified collection
    *
    * @param {string} collectionId
-   * @param {Object|Buffer} image
+   * @param {string} image
    * @param {?string} externalImageId
    * @param {?string} bucket
    * @returns {Promise} object response
@@ -118,7 +120,7 @@ class Rekognition {
    * searches the specified collection for matching faces
    *
    * @param {string} collectionId
-   * @param {Object|Buffer} image
+   * @param {string} image
    * @param {?string} bucket
    * @param {number} threshold
    * @returns {Promise} object response

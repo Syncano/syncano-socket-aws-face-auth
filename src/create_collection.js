@@ -5,8 +5,6 @@ import Rekognition from './utils/Rekognition';
 export default (ctx) => {
   const {response, logger} = Syncano(ctx);
 
-  const log = logger('Socket scope');
-
   const config = {
     AWS_ACCESS_KEY_ID: ctx.config.AWS_ACCESS_KEY_ID,
     AWS_SECRET_ACCESS_KEY: ctx.config.AWS_SECRET_ACCESS_KEY,
@@ -17,14 +15,12 @@ export default (ctx) => {
 
   return awsRekognitionClass.createCollection(ctx.args.collectionId)
     .then((res) => {
-      log.info('success', res);
       response.json({
         collectionArn: res.CollectionArn,
         statusCode: res.StatusCode
       });
     })
     .catch((err) => {
-      log.info('fail', err);
       response.json({
         statusCode: err.statusCode,
         code: err.code,
