@@ -5,7 +5,7 @@ import dotenv from 'dotenv';
 
 dotenv.config({ silent: process.env.NODE_ENV === 'production' });
 
-describe('create_collection', () => {
+describe('delete_collection', () => {
   const meta = generateMeta();
 
   const config = {
@@ -18,15 +18,15 @@ describe('create_collection', () => {
     collectionId: 'collectionTest'
   };
 
-  after((done) => {
-    run('delete_collection', {args, meta, config})
+  before((done) => {
+    run('create_collection', {args, meta, config})
       .then(() => {
         done();
       });
   });
 
   it('with valid collection name', (done) => {
-    run('create_collection', {args, meta, config})
+    run('delete_collection', {args, meta, config})
       .then((res) => {
         assert.propertyVal(res, 'code', 200);
         assert.propertyVal(res, 'mimetype', 'application/json');
@@ -38,10 +38,30 @@ describe('create_collection', () => {
       });
   });
 
+  it('with collection name that does not exist', (done) => {
+    const argsWithNonExistingName = {collectionId: 'nonExistingName'};
+
+    run('delete_collection', {args: argsWithNonExistingName, meta, config})
+      .then((res) => {
+        assert.propertyVal(res, 'code', 400);
+        assert.propertyVal(res, 'mimetype', 'application/json');
+        assert.propertyVal(res.data, 'code', 'ResourceNotFoundException');
+        assert.propertyVal(
+          res.data,
+          'message',
+          'The collection id: nonExistingName does not exist'
+        );
+        done();
+      })
+      .catch((err) => {
+        done(err);
+      });
+  });
+
   it('without collection name', (done) => {
     const argsWithoutData = {};
 
-    run('create_collection', {args: argsWithoutData, meta, config})
+    run('delete_collection', {args: argsWithoutData, meta, config})
       .then((res) => {
         assert.propertyVal(res, 'code', 400);
         assert.propertyVal(res, 'mimetype', 'application/json');
