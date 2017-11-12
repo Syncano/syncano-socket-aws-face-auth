@@ -18,13 +18,6 @@ describe('create_collection', () => {
     collectionId: 'collectionTest'
   };
 
-  after((done) => {
-    run('delete_collection', {args, meta, config})
-      .then(() => {
-        done();
-      });
-  });
-
   it('with valid collection name', (done) => {
     run('create_collection', {args, meta, config})
       .then((res) => {

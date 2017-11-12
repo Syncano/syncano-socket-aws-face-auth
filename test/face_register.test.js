@@ -1,5 +1,5 @@
 import path from 'path';
-import { expect, assert } from 'chai';
+import { assert } from 'chai';
 import {run, generateMeta} from 'syncano-test';
 
 import dotenv from 'dotenv';
@@ -21,27 +21,13 @@ describe('face_register', () => {
     bucketName: process.env.AWS_BUCKET_NAME
   };
 
-  const base64ImageOne = path.join(__dirname, './photos/conte.jpeg');
-  const base64ImageTwo = path.join(__dirname, './photos/hazard.jpeg');
-  const argsWithBase64ImageOne = Object.assign({}, args, { image: base64ImageOne, bucketName: ''});
-  const argsWithBase64ImageTwo = Object.assign({}, args, { image: base64ImageTwo, bucketName: ''});
-
-  before((done) => {
-    run('create_collection', {args: {collectionId: 'collectionTest'}, meta, config})
-      .then(() => run('face_register', {args: argsWithBase64ImageOne, meta, config}))
-      .then(() => {
-        done();
-      })
-      .catch((err) => {
-        done(err);
-      });
-  });
+  const base64Image = path.join(__dirname, './photos/conte.jpeg');
+  const argsWithBase64Image = Object.assign({}, args, { image: base64Image, bucketName: ''});
 
   describe('with valid parameters', () => {
     it('should register with s3 bucket image', (done) => {
       run('face_register', {args, meta, config})
         .then((res) => {
-          console.log(res, 'bucket>>>>>>>>>');
           assert.propertyVal(res, 'code', 200);
           assert.propertyVal(res, 'mimetype', 'application/json');
           assert.property(res.data, 'userId');
@@ -50,44 +36,37 @@ describe('face_register', () => {
     });
 
     it('should register with base64-encoded bytes', (done) => {
-      run('face_register', {args: argsWithBase64ImageTwo, meta, config})
+      run('face_register', {args: argsWithBase64Image, meta, config})
         .then((res) => {
           assert.propertyVal(res, 'code', 200);
           assert.propertyVal(res, 'mimetype', 'application/json');
           assert.property(res.data, 'userId');
           done();
-        })
-        .catch((err) => {
-          done(err);
+        });
+    });
+
+    it('should fail with already existing user', (done) => {
+      run('face_register', {args: argsWithBase64Image, meta, config})
+        .then((res) => {
+          assert.propertyVal(res, 'code', 201);
+          assert.propertyVal(res, 'mimetype', 'application/json');
+          assert.propertyVal(res.data, 'message', 'User already exist');
+          done();
         });
     });
   });
 
-  it('with already existing user', (done) => {
-    run('face_register', {args: argsWithBase64ImageOne, meta, config})
-      .then((res) => {
-        assert.propertyVal(res, 'code', 201);
-        assert.propertyVal(res, 'mimetype', 'application/json');
-        assert.propertyVal(res.data, 'message', 'User already exist');
-        done();
-      })
-      .catch((err) => {
-        done(err);
-      });
-  });
-
-  it('with non existing bucketName for s3 bucket image', (done) => {
-    const argsWrongBucketName = Object.assign({}, args, { bucketName: 'wrongBucketName'});
-    run('face_register', {args: argsWrongBucketName, meta, config})
-      .then((res) => {
-        assert.propertyVal(res, 'code', 400);
-        assert.propertyVal(res, 'mimetype', 'application/json');
-        assert.propertyVal(res.data, 'code', 'InvalidS3ObjectException');
-        assert.property(res.data, 'message');
-        done();
-      })
-      .catch((err) => {
-        done(err);
-      });
+  describe('with wrong parameters', () => {
+    it('should fail with non existing bucketName for s3 bucket image', (done) => {
+      const argsWrongBucketName = Object.assign({}, args, { bucketName: 'wrongBucketName'});
+      run('face_register', {args: argsWrongBucketName, meta, config})
+        .then((res) => {
+          assert.propertyVal(res, 'code', 400);
+          assert.propertyVal(res, 'mimetype', 'application/json');
+          assert.propertyVal(res.data, 'code', 'InvalidS3ObjectException');
+          assert.property(res.data, 'message');
+          done();
+        });
+    });
   });
 });
