@@ -7,7 +7,7 @@
     "face-auth"
   ],
   "scripts": {
-    "test": "cross-env NODE_ENV=test mocha --compilers js:babel-core/register ./test/**/*.test.js --timeout 10000"
+    "test": "cross-env NODE_ENV=test mocha --compilers js:babel-core/register ./test/all.test.js --timeout 10000"
   },
   "dependencies": {
     "aws-sdk": "^2.148.0",

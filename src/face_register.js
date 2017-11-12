@@ -4,7 +4,7 @@ import uuidv1 from 'uuid/v1';
 import Rekognition from './utils/Rekognition';
 
 export default (ctx) => {
-  const {response, logger} = Syncano(ctx);
+  const {response} = Syncano(ctx);
 
   const config = {
     AWS_ACCESS_KEY_ID: ctx.config.AWS_ACCESS_KEY_ID,
