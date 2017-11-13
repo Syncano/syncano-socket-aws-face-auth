@@ -1,10 +1,6 @@
 import { expect, assert } from 'chai';
 import {run, generateMeta} from 'syncano-test';
 
-import dotenv from 'dotenv';
-
-dotenv.config({ silent: process.env.NODE_ENV === 'production' });
-
 describe('create_collection', () => {
   const meta = generateMeta();
 

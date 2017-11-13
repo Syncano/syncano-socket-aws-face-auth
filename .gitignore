@@ -5,5 +5,5 @@ coverage/
 **/scripts/.bundles
 **/.DS_Store
 .DS_STORE
-.env
+.envrc
 .nyc_output/
