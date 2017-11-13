@@ -2,6 +2,10 @@
 .dist/
 node_modules
 .env
+.nyc_output/*
+# exception to the rule
+!.nyc_output/.gitkeep
+coverage
 **/scripts/.bundles
 **/.DS_Store
 .DS_STORE
