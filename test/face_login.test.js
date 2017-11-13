@@ -2,6 +2,10 @@ import path from 'path';
 import { assert } from 'chai';
 import {run, generateMeta} from 'syncano-test';
 
+import dotenv from 'dotenv';
+
+dotenv.config();
+
 describe('face_login', () => {
   const meta = generateMeta();
 
