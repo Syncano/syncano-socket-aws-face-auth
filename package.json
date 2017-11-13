@@ -12,8 +12,8 @@
     ]
   },
   "scripts": {
-    "test:e2e": "cross-env NODE_ENV=test nyc --reporter=html --reporter=text mocha --compilers js:babel-core/register ./test/all.test.js --timeout 10000",
-    "test": "npm run lint && npm run test:e2e",
+    "test:e2e": "cross-env NODE_ENV=test nyc --reporter=html mocha --opts ./test/mocha.opts ./test/all.test.js",
+    "test": "npm run lint && npm run test:e2e && nyc report",
     "lint": "esw src test"
   },
   "dependencies": {
