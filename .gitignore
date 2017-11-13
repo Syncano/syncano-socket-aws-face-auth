@@ -1,11 +1,9 @@
 .idea/
 .dist/
 node_modules
-.env
-.nyc_output/*
-# exception to the rule
-!.nyc_output/.gitkeep
-coverage
+coverage/
 **/scripts/.bundles
 **/.DS_Store
 .DS_STORE
+.env
+.nyc_output/
