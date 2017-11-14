@@ -1,14 +1,12 @@
 import path from 'path';
 import { assert } from 'chai';
-import {run, generateMeta} from 'syncano-test';
+import { run } from 'syncano-test';
 
 import dotenv from 'dotenv';
 
 dotenv.config();
 
 describe('face_register', () => {
-  const meta = generateMeta();
-
   const config = {
     AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID,
     AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY,
@@ -26,7 +24,7 @@ describe('face_register', () => {
 
   describe('with valid parameters', () => {
     it('should register with s3 bucket image', (done) => {
-      run('face_register', {args, meta, config})
+      run('face_register', {args, config})
         .then((res) => {
           assert.propertyVal(res, 'code', 200);
           assert.propertyVal(res, 'mimetype', 'application/json');
@@ -36,7 +34,7 @@ describe('face_register', () => {
     });
 
     it('should register with base64-encoded bytes', (done) => {
-      run('face_register', {args: argsWithBase64Image, meta, config})
+      run('face_register', {args: argsWithBase64Image, config})
         .then((res) => {
           assert.propertyVal(res, 'code', 200);
           assert.propertyVal(res, 'mimetype', 'application/json');
@@ -46,7 +44,7 @@ describe('face_register', () => {
     });
 
     it('should fail with already existing user', (done) => {
-      run('face_register', {args: argsWithBase64Image, meta, config})
+      run('face_register', {args: argsWithBase64Image, config})
         .then((res) => {
           assert.propertyVal(res, 'code', 201);
           assert.propertyVal(res, 'mimetype', 'application/json');
@@ -59,7 +57,7 @@ describe('face_register', () => {
   describe('with wrong parameters', () => {
     it('should fail with non existing bucketName for s3 bucket image', (done) => {
       const argsWrongBucketName = Object.assign({}, args, { bucketName: 'wrongBucketName'});
-      run('face_register', {args: argsWrongBucketName, meta, config})
+      run('face_register', {args: argsWrongBucketName, config})
         .then((res) => {
           assert.propertyVal(res, 'code', 400);
           assert.propertyVal(res, 'mimetype', 'application/json');

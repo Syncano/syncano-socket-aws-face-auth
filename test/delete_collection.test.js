@@ -1,13 +1,11 @@
 import { expect, assert } from 'chai';
-import {run, generateMeta} from 'syncano-test';
+import { run } from 'syncano-test';
 
 import dotenv from 'dotenv';
 
 dotenv.config();
 
 describe('delete_collection', () => {
-  const meta = generateMeta();
-
   const config = {
     AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID,
     AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY,
@@ -19,7 +17,7 @@ describe('delete_collection', () => {
   };
 
   it('with valid collection name', (done) => {
-    run('delete_collection', {args, meta, config})
+    run('delete_collection', {args, config})
       .then((res) => {
         assert.propertyVal(res, 'code', 200);
         assert.propertyVal(res, 'mimetype', 'application/json');
@@ -34,7 +32,7 @@ describe('delete_collection', () => {
   it('with collection name that does not exist', (done) => {
     const argsWithNonExistingName = {collectionId: 'nonExistingName'};
 
-    run('delete_collection', {args: argsWithNonExistingName, meta, config})
+    run('delete_collection', {args: argsWithNonExistingName, config})
       .then((res) => {
         assert.propertyVal(res, 'code', 400);
         assert.propertyVal(res, 'mimetype', 'application/json');
@@ -54,7 +52,7 @@ describe('delete_collection', () => {
   it('without collection name', (done) => {
     const argsWithoutData = {};
 
-    run('delete_collection', {args: argsWithoutData, meta, config})
+    run('delete_collection', {args: argsWithoutData, config})
       .then((res) => {
         assert.propertyVal(res, 'code', 400);
         assert.propertyVal(res, 'mimetype', 'application/json');
