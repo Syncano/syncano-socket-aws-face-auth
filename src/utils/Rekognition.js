@@ -1,5 +1,6 @@
 import AWS from 'aws-sdk';
 import fs from 'fs';
+import request from 'request';
 
 /**
  * Rekognition Class
@@ -38,26 +39,53 @@ class Rekognition {
         });
     });
   }
+  /**
+   * Converts URL containing an image and converts it to bytes
+   *
+   * @param {string} imageUrl
+   * @returns {Object} byte object
+   */
+  static convertImageToBytes(imageUrl) {
+    return new Promise((resolve, reject) => {
+      const file = fs.createWriteStream('image.png');
+      request.get(imageUrl).on('response', (response) => {
+        response.pipe(file).on('close', () => {
+          if (fs.existsSync('image.png')) {
+            try {
+              return resolve(fs.readFileSync('image.png'));
+            } catch (err) {
+              return reject(err);
+            }
+          }
+          return reject(new Error('file not found'));
+        });
+      });
+    });
+  }
 
   /**
    * Utility to get image params for s3 object or Bytes
    *
    * @param {string} image
-   * @param {?string} bucket
+   * @param {string} bucketName
    * @returns {Object} image params for Rekognition
    */
-  static getImageParams(image, bucket) {
-    return bucket !== null
-      ? {
+  static async getImageParams(image, bucketName) {
+    if (bucketName !== null) {
+      return {
         S3Object: {
-          Bucket: bucket,
+          Bucket: bucketName,
           Name: image
         }
-      }
-      :
-      {
-        Bytes: fs.readFileSync(image)
       };
+    }
+    try {
+      return {
+        Bytes: await Rekognition.convertImageToBytes(image)
+      };
+    } catch (err) {
+      return { Bytes: [] };
+    }
   }
 
   /**
@@ -117,7 +145,7 @@ class Rekognition {
   }
 
   /**
-   * searches the specified collection for matching faces
+   * searches the specified collection for matching faces using image
    *
    * @param {string} collectionId
    * @param {string} image
@@ -125,15 +153,49 @@ class Rekognition {
    * @param {number} threshold
    * @returns {Promise} object response
    */
-  searchFacesByImage(collectionId, image, bucket = null, threshold = 90) {
+  searchFacesByImage(collectionId, image, bucket = null, threshold = 95) {
     const params = {
       CollectionId: collectionId,
       Image: Rekognition.getImageParams(image, bucket),
       FaceMatchThreshold: threshold,
-      MaxFaces: 1 // We only need the face with the most resemblance
+      // MaxFaces: 1 // We only need the face with the most resemblance
     };
 
     return this.doCall('searchFacesByImage', params);
+  }
+
+  /**
+   * searches the specified collection for matching faces using faceId
+   *
+   * @param {string} collectionId
+   * @param {string} faceId
+   * @param {number} threshold
+   * @returns {Promise} object response
+   */
+  searchFaces(collectionId, faceId, threshold = 95) {
+    const params = {
+      CollectionId: collectionId,
+      FaceId: faceId,
+      FaceMatchThreshold: threshold
+    };
+
+    return this.doCall('searchFaces', params);
+  }
+
+  /**
+   * deletes faces from collection matching the faceId(s)
+   *
+   * @param {string} collectionId
+   * @param {array} faceId
+   * @returns {Promise} object response
+   */
+  deleteFaces(collectionId, faceId) {
+    const params = {
+      CollectionId: collectionId,
+      FaceIds: faceId
+    };
+
+    return this.doCall('deleteFaces', params);
   }
 }
 

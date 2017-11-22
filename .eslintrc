@@ -29,6 +29,7 @@
     "linebreak-style": 0,
     "no-undef": 0,
     "import/no-unresolved": 0,
+    "prefer-promise-reject-errors":0,
     "valid-jsdoc": [1,{
       "requireReturn": true,
       "requireReturnType": true,

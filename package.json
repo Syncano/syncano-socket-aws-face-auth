@@ -18,6 +18,8 @@
   },
   "dependencies": {
     "aws-sdk": "^2.148.0",
+    "axios": "^0.17.1",
+    "request": "^2.83.0",
     "syncano-server": "beta",
     "uuid": "^3.1.0"
   },

@@ -1,5 +1,5 @@
-name: syncano-socket-aws-face-auth
-description: Description of syncano-socket-aws-face-auth
+name: aws-face-auth
+description: User auth/register socket with aws rekognition
 version: 0.0.1
 keywords:
   - user
@@ -7,6 +7,8 @@ keywords:
   - auth
   - authentication
   - register
+  - aws
+  - rekognition
 config:
   AWS_REGION:
     description: AWS region
@@ -23,6 +25,15 @@ config:
       Visit link to know more about managing keys
       (http://docs.aws.amazon.com/general/latest/gr/managing-aws-access-keys.html).
     required: true
+
+classes:
+  user:
+    - name: face_auth
+      type: boolean
+      filter_index: true
+    - name: external_face_id
+      type: string
+      filter_index: true
 
 endpoints:
   create_collection:
@@ -80,20 +91,28 @@ endpoints:
             }
   face_register:
     description: |
-      For a given input image search the specified collection for matching faces
-      if no match found Detects faces in the input image and add them to the
-      specified collection.
+      Register face to existing user account for face authentication.
+      Client-side to send user's username and password(expected user to approve by confirming password)
+      to register face to user's account.
     parameters:
+      username:
+        type: string
+        description: "Username of user"
+        example: "you@domain.com"
+      password:
+        type: string
+        description: "Password of user"
+        example: ""
       collectionId:
         type: string
-        description: "ID of the collection to delete"
+        description: "ID of the collection"
         example: "SyncanoFaces"
       image:
         type: string
         description: "Path to image or an S3 object key"
       bucketName:
         type: string
-        description: "Name of s3 bucket. Make null if image not on s3 bucket."
+        description: "Name of s3 bucket. Leave empty if image not on s3 bucket."
     response:
       mimetype: application/json
       examples:
@@ -102,33 +121,28 @@ endpoints:
           description: Success
           example: |
             {
-            "statusCode": 200,
-            "userId": "12345",
+              "message": "User account registered for face authentication."
             }
         -
           exit_code: 400
           description: Failed
           example: |
             {
-              "statusCode": 400,
-              "code": "InvalidImageFormatException",
-              "message":"The provided image format is not supported."
+              "message": "Fail to register user for face authentication."
             }
   face_login:
-    description: |
-      For a given input image search the specified collection for
-      matching faces and return the userId if match found
+    description: Login to a user account using face image
     parameters:
       collectionId:
         type: string
-        description: "ID of the collection to delete"
+        description: "ID of the collection"
         example: "SyncanoFaces"
       image:
         type: string
         description: "Path to image or an S3 object key"
       bucketName:
         type: string
-        description: "Name of s3 bucket. Make null if image not on s3 bucket."
+        description: "Name of s3 bucket. Leave empty if image not on s3 bucket."
     response:
       mimetype: application/json
       examples:
@@ -149,3 +163,14 @@ endpoints:
               "code": "InvalidImageFormatException",
               "message":"The provided image format is not supported."
             }
+  register:
+    file: face_auth.js
+    parameters:
+      username:
+        type: string
+        description: User name
+        example: joe
+      password:
+        type: string
+        description: User password
+        example: super-sercret-password
