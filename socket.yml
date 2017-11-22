@@ -1,5 +1,6 @@
 name: aws-face-auth
-description: User auth/register socket with aws rekognition
+description: |
+  User face authentication socket with aws rekognition. For basic authentication use 'rest-auth' socket
 version: 0.0.1
 keywords:
   - user
@@ -31,7 +32,7 @@ classes:
     - name: face_auth
       type: boolean
       filter_index: true
-    - name: external_face_id
+    - name: external_image_id
       type: string
       filter_index: true
 
@@ -51,8 +52,8 @@ endpoints:
           description: Success
           example: |
             {
-            "collectionArn": "12345",
-            "statusCode": 200
+              "collectionArn": "12345",
+              "statusCode": 200
             }
         -
           exit_code: 400
@@ -121,14 +122,14 @@ endpoints:
           description: Success
           example: |
             {
-              "message": "User account registered for face authentication."
+              message: "User account registered for face authentication."
             }
         -
           exit_code: 400
           description: Failed
           example: |
             {
-              "message": "Fail to register user for face authentication."
+              message: "Fail to register face."
             }
   face_login:
     description: Login to a user account using face image
@@ -151,26 +152,79 @@ endpoints:
           description: Success
           example: |
             {
-            "statusCode": 200,
-            "userId": "12345",
+              token: "cb21ff98ac8c7dda8fcd01",
+              username: "you@domain.com"
             }
         -
           exit_code: 400
           description: Failed
           example: |
             {
-              "statusCode": 400,
-              "code": "InvalidImageFormatException",
-              "message":"The provided image format is not supported."
+              message: "Authentication fail."
             }
-  register:
-    file: face_auth.js
+  remove_face_auth:
     parameters:
       username:
         type: string
-        description: User name
-        example: joe
-      password:
+        description: "Username of user"
+        example: "you@domain.com"
+      token:
         type: string
-        description: User password
-        example: super-sercret-password
+        description: "User token"
+        example: "cb21fac8c7dda8fcd0129b0adb0254dea5c8e"
+      collectionId:
+        type: string
+        description: "ID of the collection"
+        example: "SyncanoFaces"
+      image:
+        type: string
+        description: "Path to image or an S3 object key"
+      bucketName:
+        type: string
+        description: "Name of s3 bucket. Leave empty if image not on s3 bucket."
+    response:
+      mimetype: application/json
+      examples:
+        -
+          exit_code: 200
+          description: Success
+          example: |
+            {
+              message: "User account removed from face authentication."
+            }
+        -
+          exit_code: 400
+          description: Failed
+          example: |
+            {
+              message: "Face authentication not enabled for user account."
+            }
+  verify_face_auth:
+    parameters:
+      username:
+        type: string
+        description: "Username of user"
+        example: "you@domain.com"
+      token:
+        type: string
+        description: "User token"
+        example: "cb21fac8c7dda8fcd0129b0adb0254dea5c8e"
+    response:
+      mimetype: application/json
+      examples:
+        -
+          exit_code: 200
+          description: Success
+          example: |
+            {
+              message: "Face auth enabled on user account.",
+              is_face_auth: true
+            }
+        -
+          exit_code: 200
+          description: Failed
+          example: |
+            {
+              message: "Face auth not enabled on user account.",
+              is_face_auth: false
+            }

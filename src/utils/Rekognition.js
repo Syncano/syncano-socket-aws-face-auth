@@ -39,26 +39,32 @@ class Rekognition {
         });
     });
   }
+
   /**
    * Converts URL containing an image and converts it to bytes
-   *
    * @param {string} imageUrl
-   * @returns {Object} byte object
+   * @returns {Object} - Byte object
    */
   static convertImageToBytes(imageUrl) {
     return new Promise((resolve, reject) => {
       const file = fs.createWriteStream('image.png');
       request.get(imageUrl).on('response', (response) => {
-        response.pipe(file).on('close', () => {
-          if (fs.existsSync('image.png')) {
-            try {
-              return resolve(fs.readFileSync('image.png'));
-            } catch (err) {
-              return reject(err);
+        if (
+          response.headers['content-type'] === 'image/jpeg' ||
+          response.headers['content-type'] === 'image/png'
+        ) {
+          return response.pipe(file).on('close', () => {
+            if (fs.existsSync('image.png')) {
+              try {
+                return resolve(fs.readFileSync('image.png'));
+              } catch (err) {
+                return reject(err);
+              }
             }
-          }
-          return reject(new Error('file not found'));
-        });
+            return reject(new Error());
+          });
+        }
+        return reject(new Error());
       });
     });
   }
@@ -72,6 +78,7 @@ class Rekognition {
    */
   static async getImageParams(image, bucketName) {
     if (bucketName !== null) {
+      console.log('Hey');
       return {
         S3Object: {
           Bucket: bucketName,
@@ -133,14 +140,15 @@ class Rekognition {
    * @param {?string} bucket
    * @returns {Promise} object response
    */
-  indexFaces(collectionId, image, externalImageId = null, bucket = null) {
+  async indexFaces(collectionId, image, externalImageId = null, bucket = null) {
     const params = {
       CollectionId: collectionId,
-      Image: Rekognition.getImageParams(image, bucket)
+      Image: await Rekognition.getImageParams(image, bucket)
     };
     if (externalImageId) {
       params.ExternalImageId = externalImageId;
     }
+    console.log(params);
     return this.doCall('indexFaces', params);
   }
 
@@ -153,12 +161,11 @@ class Rekognition {
    * @param {number} threshold
    * @returns {Promise} object response
    */
-  searchFacesByImage(collectionId, image, bucket = null, threshold = 95) {
+  async searchFacesByImage(collectionId, image, bucket = null, threshold = 95) {
     const params = {
       CollectionId: collectionId,
-      Image: Rekognition.getImageParams(image, bucket),
+      Image: await Rekognition.getImageParams(image, bucket),
       FaceMatchThreshold: threshold,
-      // MaxFaces: 1 // We only need the face with the most resemblance
     };
 
     return this.doCall('searchFacesByImage', params);
