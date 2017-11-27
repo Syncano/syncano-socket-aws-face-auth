@@ -25,7 +25,7 @@ class Rekognition {
    *
    * @param {string} endpoint
    * @param {Object} params
-   * @returns {Promise} response object
+   * @returns {Promise}
    */
   doCall(endpoint, params) {
     return new Promise((resolve, reject) => {
@@ -43,7 +43,7 @@ class Rekognition {
   /**
    * Converts URL containing an image and converts it to bytes
    * @param {string} imageUrl
-   * @returns {Object} - Byte object
+   * @returns {Object}
    */
   static convertImageToBytes(imageUrl) {
     return new Promise((resolve, reject) => {
@@ -78,7 +78,6 @@ class Rekognition {
    */
   static async getImageParams(image, bucketName) {
     if (bucketName !== null) {
-      console.log('Hey');
       return {
         S3Object: {
           Bucket: bucketName,
@@ -99,7 +98,7 @@ class Rekognition {
    * Creates a collection
    *
    * @param {string} collectionId
-   * @returns {Promise} object response
+   * @returns {Promise}
    */
   createCollection(collectionId) {
     const params = {
@@ -112,7 +111,7 @@ class Rekognition {
    * Deletes a collection
    *
    * @param {string} collectionId
-   * @returns {Promise} object response
+   * @returns {Promise}
    */
   deleteCollection(collectionId) {
     const params = {
@@ -125,7 +124,7 @@ class Rekognition {
   /**
    * List collections
    *
-   * @returns {Promise} object response
+   * @returns {Promise}
    */
   listCollections() {
     return this.doCall('listCollections', {});
@@ -138,7 +137,7 @@ class Rekognition {
    * @param {string} image
    * @param {?string} externalImageId
    * @param {?string} bucket
-   * @returns {Promise} object response
+   * @returns {Promise}
    */
   async indexFaces(collectionId, image, externalImageId = null, bucket = null) {
     const params = {
@@ -148,7 +147,6 @@ class Rekognition {
     if (externalImageId) {
       params.ExternalImageId = externalImageId;
     }
-    console.log(params);
     return this.doCall('indexFaces', params);
   }
 
@@ -159,7 +157,7 @@ class Rekognition {
    * @param {string} image
    * @param {?string} bucket
    * @param {number} threshold
-   * @returns {Promise} object response
+   * @returns {Promise}
    */
   async searchFacesByImage(collectionId, image, bucket = null, threshold = 95) {
     const params = {
@@ -172,29 +170,11 @@ class Rekognition {
   }
 
   /**
-   * searches the specified collection for matching faces using faceId
-   *
-   * @param {string} collectionId
-   * @param {string} faceId
-   * @param {number} threshold
-   * @returns {Promise} object response
-   */
-  searchFaces(collectionId, faceId, threshold = 95) {
-    const params = {
-      CollectionId: collectionId,
-      FaceId: faceId,
-      FaceMatchThreshold: threshold
-    };
-
-    return this.doCall('searchFaces', params);
-  }
-
-  /**
    * deletes faces from collection matching the faceId(s)
    *
    * @param {string} collectionId
    * @param {array} faceId
-   * @returns {Promise} object response
+   * @returns {Promise}
    */
   deleteFaces(collectionId, faceId) {
     const params = {
