@@ -26,7 +26,9 @@ export default (ctx) => {
   const getUser = (res) => {
     return users.where('external_image_id', res.FaceMatches[0].Face.ExternalImageId)
       .firstOrFail()
-      .then(data => response.json({token: data.user_key, username: data.username}))
+      .then((data) => {
+        return response.json({token: data.user_key, username: data.username});
+      })
       .catch(() => {
         const message = 'Authentication fail.';
         return Promise.reject({ message, statusCode: 401 });

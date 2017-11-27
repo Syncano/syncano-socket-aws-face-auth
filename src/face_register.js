@@ -62,7 +62,7 @@ export default (ctx) => {
     const faceIds = res.FaceRecords.map(record => record.Face.FaceId);
     return awsRekognitionClass.deleteFaces(collectionId, faceIds)
       .then(() => {
-        return Promise.reject({message, code: 400});
+        return Promise.reject({message, statusCode: 400});
       }).catch(err => Promise.reject({ message: err.message, statusCode: 400 }));
   };
 
@@ -84,7 +84,9 @@ export default (ctx) => {
   const updateUserSchema = (res) => {
     users.where('username', username)
       .update({face_auth: true, external_image_id: res.FaceRecords[0].Face.ExternalImageId })
-      .then(() => response.json({ message: 'User account registered for face authentication.' }))
+      .then(() => {
+        return response.json({ message: 'User face registered for face authentication.' });
+      })
       .catch((err) => {
         const message = (err.data) ? err.data : err.message;
         return deleteFaces(res, message);

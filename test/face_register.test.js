@@ -1,70 +1,145 @@
-import path from 'path';
+import request from 'supertest';
 import { assert } from 'chai';
-import { run } from 'syncano-test';
 
 import dotenv from 'dotenv';
 
 dotenv.config();
 
 describe('face_register', () => {
-  const config = {
-    AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID,
-    AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY,
-    AWS_REGION: process.env.AWS_REGION,
-  };
+  const VERIFY_URL = `https://api.syncano.io/v2/instances/${process.env.INSTANCE_NAME}/` +
+    'endpoints/sockets/aws-face-auth/face_register/';
+  const requestUrl = request(VERIFY_URL);
 
-  const args = {
-    collectionId: 'collectionTest',
-    image: process.env.AWS_S3_IMAGE_KEY,
-    bucketName: process.env.AWS_BUCKET_NAME
-  };
+  const REGISTER_URL = `https://api.syncano.io/v2/instances/${process.env.INSTANCE_NAME}/` +
+    'endpoints/sockets/rest-auth/register/';
+  const registerUrl = request(REGISTER_URL);
 
-  const base64Image = path.join(__dirname, './photos/conte.jpeg');
-  const argsWithBase64Image = Object.assign({}, args, { image: base64Image, bucketName: ''});
+  const LOGIN_URL = `https://api.syncano.io/v2/instances/${process.env.INSTANCE_NAME}/` +
+    'endpoints/sockets/rest-auth/login/';
+  const loginrUrl = request(LOGIN_URL);
 
-  describe('with valid parameters', () => {
-    it('should register with s3 bucket image', (done) => {
-      run('face_register', {args, config})
-        .then((res) => {
-          assert.propertyVal(res, 'code', 200);
-          assert.propertyVal(res, 'mimetype', 'application/json');
-          assert.property(res.data, 'userId');
-          done();
-        });
-    });
+  const bucketName = process.env.AWS_BUCKET_NAME;
+  const userImage = process.env.AWS_S3_USER_IMAGE_KEY;
+  const collectionId = 'collectionTest';
 
-    it('should register with base64-encoded bytes', (done) => {
-      run('face_register', {args: argsWithBase64Image, config})
-        .then((res) => {
-          assert.propertyVal(res, 'code', 200);
-          assert.propertyVal(res, 'mimetype', 'application/json');
-          assert.property(res.data, 'userId');
-          done();
-        });
-    });
+  const firstUserEmail = process.env.TEST_USER_EMAIL1;
+  const secondUserEmail = process.env.TEST_USER_EMAIL2;
+  const userPassword = process.env.TEST_USER_PASSWORD;
 
-    it('should fail with already existing user', (done) => {
-      run('face_register', {args: argsWithBase64Image, config})
-        .then((res) => {
-          assert.propertyVal(res, 'code', 201);
-          assert.propertyVal(res, 'mimetype', 'application/json');
-          assert.propertyVal(res.data, 'message', 'User already exist');
-          done();
-        });
-    });
+  before((done) => {
+    loginrUrl.post('/')
+      .send({username: firstUserEmail, password: userPassword})
+      .then((res) => {
+        if (res.status === 400) {
+          return registerUrl.post('/')
+            .send({username: firstUserEmail, password: userPassword});
+        }
+        return { status: true };
+      })
+      .then(() => {
+        done();
+      })
+      .catch((err) => {
+        done(err);
+      });
   });
 
-  describe('with wrong parameters', () => {
-    it('should fail with non existing bucketName for s3 bucket image', (done) => {
-      const argsWrongBucketName = Object.assign({}, args, { bucketName: 'wrongBucketName'});
-      run('face_register', {args: argsWrongBucketName, config})
-        .then((res) => {
-          assert.propertyVal(res, 'code', 400);
-          assert.propertyVal(res, 'mimetype', 'application/json');
-          assert.propertyVal(res.data, 'code', 'InvalidS3ObjectException');
-          assert.property(res.data, 'message');
+  before((done) => {
+    loginrUrl.post('/')
+      .send({username: secondUserEmail, password: userPassword})
+      .then((res) => {
+        if (res.status === 400) {
+          return registerUrl.post('/')
+            .send({username: secondUserEmail, password: userPassword});
+        }
+        return { status: true };
+      })
+      .then(() => {
+        done();
+      })
+      .catch((err) => {
+        done(err);
+      });
+  });
+
+  it('should register face to user account if all user credentials and image valid',
+    (done) => {
+      const argsWithValidDetails = {
+        username: firstUserEmail,
+        password: userPassword,
+        collectionId,
+        image: userImage,
+        bucketName,
+      };
+      requestUrl.post('/')
+        .send(argsWithValidDetails)
+        .expect(200)
+        .end((err, res) => {
+          if (err) return done(err);
+          assert.propertyVal(res.body,
+            'message', 'User face registered for face authentication.');
           done();
         });
     });
+
+  it('should prevent two accounts from using same face',
+    (done) => {
+      const argsWithUsedImage = {
+        username: secondUserEmail,
+        password: userPassword,
+        collectionId,
+        image: userImage,
+        bucketName,
+      };
+      requestUrl.post('/')
+        .send(argsWithUsedImage)
+        .expect(400)
+        .end((err, res) => {
+          if (err) return done(err);
+          assert.propertyVal(res.body,
+            'message', 'Image tied to another user account.');
+          done();
+        });
+    });
+
+  it('should return status "401" if wrong username or password',
+    (done) => {
+      const argsInvalidUser = {
+        username: firstUserEmail,
+        password: '11e118aa4esdkdkskdk',
+        collectionId,
+        image: userImage,
+        bucketName,
+      };
+      requestUrl.post('/')
+        .send(argsInvalidUser)
+        .expect(401)
+        .end((err, res) => {
+          if (err) return done(err);
+          assert.propertyVal(res.body,
+            'message', 'Username or password does not match any user account.');
+          done();
+        });
+    });
+
+  it('should return message "Image must consist of only one person\'s face" if image parameter ' +
+    'consist of more than one face.',
+  (done) => {
+    const argsMultipleFaces = {
+      username: firstUserEmail,
+      password: userPassword,
+      collectionId,
+      image: 'https://i2-prod.mirror.co.uk/incoming/article7030947.ece/ALTERNATES/s615/Chelsea-main.jpg',
+      bucketName: '',
+    };
+    requestUrl.post('/')
+      .send(argsMultipleFaces)
+      .expect(400)
+      .end((err, res) => {
+        if (err) return done(err);
+        assert.propertyVal(res.body,
+          'message', 'Image must consist of only one person\'s face');
+        done();
+      });
   });
 });

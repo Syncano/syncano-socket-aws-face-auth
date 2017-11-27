@@ -1,22 +1,23 @@
 import request from 'supertest';
 import { assert } from 'chai';
+
 import dotenv from 'dotenv';
 
 dotenv.config();
 
-
-describe('verify_face_auth', () => {
-  const VERIFY_URL = `https://api.syncano.io/v2/instances/${process.env.INSTANCE_NAME}/` +
-    'endpoints/sockets/aws-face-auth/verify_face_auth/';
-  const requestUrl = request(VERIFY_URL);
-
-  const REGISTER_URL = `https://api.syncano.io/v2/instances/${process.env.INSTANCE_NAME}/` +
-    'endpoints/sockets/rest-auth/register/';
-  const registerUrl = request(REGISTER_URL);
+describe('remove_face_auth', () => {
+  const REMOVE_URL = `https://api.syncano.io/v2/instances/${process.env.INSTANCE_NAME}/` +
+    'endpoints/sockets/aws-face-auth/remove_face_auth/';
+  const requestUrl = request(REMOVE_URL);
 
   const LOGIN_URL = `https://api.syncano.io/v2/instances/${process.env.INSTANCE_NAME}/` +
     'endpoints/sockets/rest-auth/login/';
   const loginrUrl = request(LOGIN_URL);
+
+  const bucketName = process.env.AWS_BUCKET_NAME;
+  const userImage = process.env.AWS_S3_USER_IMAGE_KEY;
+  const wrongImage = process.env.INAVLID_USER_AWS_S3_IMAGE_KEY;
+  const collectionId = 'collectionTest';
 
   const firstUserEmail = process.env.TEST_USER_EMAIL1;
   const secondUserEmail = process.env.TEST_USER_EMAIL2;
@@ -48,32 +49,64 @@ describe('verify_face_auth', () => {
   });
 
   describe('with valid user credentials', () => {
-    it('should return "is_face_auth" false if user not registered for face authentication',
+    it('should return "Face authentication not enabled for user account." if user not ' +
+    'registered for face authentication',
+    (done) => {
+      const argsUserFaceAuthNotRegistered = {
+        username: secondUserEmail,
+        token: secondUserToken,
+        collectionId,
+        image: userImage,
+        bucketName,
+      };
+      requestUrl.post('/')
+        .send(argsUserFaceAuthNotRegistered)
+        .expect(400)
+        .end((err, res) => {
+          if (err) return done(err);
+          assert.propertyVal(res.body, 'message',
+            'Face authentication not enabled for user account.'
+          );
+          done();
+        });
+    });
+
+    it('should return "Face image not tied to this account." if image parameter not for user',
       (done) => {
-        const argsUserFaceAuthNotRegistered = { username: secondUserEmail, token: secondUserToken };
+        const argsUserFaceRegisteredWrongImage = {
+          username: firstUserEmail,
+          token: firstUserToken,
+          collectionId,
+          image: wrongImage,
+          bucketName,
+        };
         requestUrl.post('/')
-          .send(argsUserFaceAuthNotRegistered)
-          .expect(200)
+          .send(argsUserFaceRegisteredWrongImage)
+          .expect(400)
           .end((err, res) => {
             if (err) return done(err);
-            assert.propertyVal(res.body, 'is_face_auth', false);
-            assert.property(res.body, 'message');
+            assert.propertyVal(res.body, 'message', 'Face image not tied to this account.');
             done();
           });
       });
 
-    it('should return "is_face_auth" true if user registered for face authentication',
+    it('should remove user account from face authentication if all parameters for user valid',
       (done) => {
         const argsUserFaceRegistered = {
-          username: firstUserEmail, token: firstUserToken
+          username: firstUserEmail,
+          token: firstUserToken,
+          collectionId,
+          image: userImage,
+          bucketName,
         };
         requestUrl.post('/')
           .send(argsUserFaceRegistered)
           .expect(200)
           .end((err, res) => {
             if (err) return done(err);
-            assert.propertyVal(res.body, 'is_face_auth', true);
-            assert.property(res.body, 'message');
+            assert.propertyVal(res.body, 'message',
+              'User account removed from face authentication.'
+            );
             done();
           });
       });
@@ -83,7 +116,11 @@ describe('verify_face_auth', () => {
     it('should show "Given credentials does not match any user account." if username not existing',
       (done) => {
         const argsInvalidUsername = {
-          username: 'you22lllll@gmail.com', token: '11e118aa4eefeff12ab6d1'
+          username: 'you22lllll@gmail.com',
+          token: '11e118aa4eefeff12ab6d1',
+          collectionId,
+          image: userImage,
+          bucketName,
         };
         requestUrl.post('/')
           .send(argsInvalidUsername)
@@ -99,7 +136,11 @@ describe('verify_face_auth', () => {
     it('should show "Given credentials does not match any user account." if token not for user',
       (done) => {
         const argsInvalidUserToken = {
-          username: firstUserEmail, token: '11e118aa4ee12ab6d18a6de930787'
+          username: firstUserEmail,
+          token: '11e118aa4eefeff12ab6d18a6de930787',
+          collectionId,
+          image: userImage,
+          bucketName,
         };
         requestUrl.post('/')
           .send(argsInvalidUserToken)
