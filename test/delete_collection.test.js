@@ -12,9 +12,7 @@ describe('delete_collection', () => {
     AWS_REGION: process.env.AWS_REGION,
   };
 
-  const args = {
-    collectionId: 'collectionTest'
-  };
+  const args = {collectionId: 'collectionTest'};
 
   it('with valid collection name', (done) => {
     run('delete_collection', {args, config})
