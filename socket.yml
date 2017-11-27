@@ -163,6 +163,7 @@ endpoints:
               message: "Authentication fail."
             }
   remove_face_auth:
+    description: Remove face authentication for particular user
     parameters:
       username:
         type: string
@@ -200,6 +201,7 @@ endpoints:
               message: "Face authentication not enabled for user account."
             }
   verify_face_auth:
+    description: Checks if user face authentication is enabled
     parameters:
       username:
         type: string

@@ -1,18 +1,15 @@
-/* eslint arrow-body-style: 0 */
 import Syncano from 'syncano-server';
 
 import Rekognition from './utils/Rekognition';
 
 export default (ctx) => {
-  const {response, logger, users} = Syncano(ctx);
+  const {response, users} = Syncano(ctx);
 
   const {
     username, token, collectionId, image, bucketName
   } = ctx.args;
 
   const s3bucket = (bucketName || bucketName.trim() !== '') ? bucketName : null;
-
-  const log = logger('Socket scope');
 
   const awsRekognitionClass = new Rekognition(ctx.config);
 
@@ -24,12 +21,12 @@ export default (ctx) => {
   const verifyUserFaceAuthRegistered = (data) => {
     if (data.user_key !== token) {
       return Promise.reject({
-        message: 'User credentials does not match any user account.', code: 400
+        message: 'Given credentials does not match any user account.', statusCode: 401
       });
     }
     if (data.face_auth === false || data.face_auth === null) {
       return Promise.reject({
-        message: 'Face authentication not enabled for user account.', code: 400
+        message: 'Face authentication not enabled for user account.', statusCode: 400
       });
     }
     return data;
@@ -37,65 +34,61 @@ export default (ctx) => {
 
   /**
    * Check for faces tied to user account
+   * @param {object} data
    * @returns {Promise.<*>} promise
    */
-  const searchUserFaces = () => {
+  const searchUserFaces = (data) => {
     return awsRekognitionClass.searchFacesByImage(collectionId, image, s3bucket)
       .then((res) => {
-        return res;
+        if (res.FaceMatches.length > 0) {
+          if (res.FaceMatches[0].Face.ExternalImageId !== data.external_image_id) {
+            return Promise.reject({
+              message: 'Face image not tied to this account.', statusCode: 400
+            });
+          }
+          return res;
+        }
+        return Promise.reject({message: 'Face image not tied to this account.', statusCode: 400});
       })
-      .catch(err => Promise.reject({ message: err.message, code: 400 }));
+      .catch(err => Promise.reject({ message: err.message, statusCode: 400 }));
   };
-
 
   /**
    * Delete faces
    * @param {object} res
-   * @returns {Promise.<*>} return
+   * @returns {*}
    */
   const deleteFaces = (res) => {
-    const faceIds = res.FaceMatches.map(record => record.Face.FaceId);
-    log.info('faceIds to delete!', faceIds);
-    return awsRekognitionClass.deleteFaces(collectionId, faceIds)
-      .then((delRes) => {
-        log.info('Hey>>>>>>>>>>>', delRes);
-        return delRes;
-      }).catch(err => Promise.reject({ message: err.message, code: 400 }));
+    if (res.FaceMatches.length > 0) {
+      const faceIds = res.FaceMatches.map(record => record.Face.FaceId);
+      return awsRekognitionClass.deleteFaces(collectionId, faceIds)
+        .then((delRes) => {
+          return delRes;
+        }).catch(err => Promise.reject({ message: err.message, statusCode: 400 }));
+    }
+    return res;
   };
 
   const updateUserSchema = () => {
-    log.info('Oya update Schema');
     users.where('username', username)
       .update({face_auth: false, external_image_id: '' })
       .then(() => response.json({ message: 'User account removed from face authentication.' }))
       .catch((err) => {
-        log.info('Oppsss Eyaaa');
         const message = (err.data) ? err.data : err.message;
-        return Promise.reject({ message, code: 400 });
+        return Promise.reject({ message, statusCode: 400 });
       });
   };
 
-  /**
-   * handle all errors
-   * @param {object} err
-   * @returns {*} error response
-   */
-  const handleError = (err) => {
-    if (err.code) {
-      const errorMessage = { message: err.message };
-      if (err.errors) {
-        errorMessage.errors = err.errors;
-      }
-      return response.json(errorMessage, 400);
-    }
-    return response.json({ message: 'Fail to remove user face authentication' }, 400);
-  };
-
-  users.where('username', username)
-    .first()
+  return users.where('username', username)
+    .firstOrFail()
     .then(verifyUserFaceAuthRegistered)
     .then(searchUserFaces)
     .then(deleteFaces)
     .then(updateUserSchema)
-    .catch(err => handleError(err));
+    .catch((err) => {
+      if (err.statusCode) {
+        return response.json(err, err.statusCode);
+      }
+      return response.json({ message: 'Given credentials does not match any user account.' }, 401);
+    });
 };

@@ -9,12 +9,12 @@ export default (ctx) => {
 
   return awsRekognitionClass.deleteCollection(ctx.args.collectionId)
     .then((res) => {
-      response.json({
+      return response.json({
         statusCode: res.StatusCode
       });
     })
     .catch((err) => {
-      response.json({
+      return response.json({
         statusCode: err.statusCode,
         code: err.code,
         message: err.message
