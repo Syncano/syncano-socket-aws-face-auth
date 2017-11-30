@@ -8,10 +8,11 @@ export default (ctx) => {
   const { users, response } = Syncano(ctx);
 
   const {
-    username, password, collectionId, image, bucketName
+    username, password, collectionId, image
   } = ctx.args;
 
-  const s3bucket = (bucketName || bucketName.trim() !== '') ? bucketName : null;
+  const s3bucket = (!ctx.args.bucketName || ctx.args.bucketName.trim() === '')
+    ? null : ctx.args.bucketName;
 
   const AUTH_URL = `https://api.syncano.io/v2/instances/${ctx.meta.instance}/users/auth/`;
 
@@ -23,7 +24,8 @@ export default (ctx) => {
    * @returns {Promise.<*>} promise
    */
   const searchUserFace = ({data}) => {
-    return awsRekognitionClass.searchFacesByImage(collectionId, image, s3bucket)
+    return awsRekognitionClass.searchFacesByImage(collectionId, image, s3bucket,
+      ctx.config.FACE_MATCH_THRESHOLD)
       .then((res) => {
         if (res.FaceMatches.length === 0) {
           return data;
@@ -71,7 +73,7 @@ export default (ctx) => {
    * @param {object} res
    * @returns {*} promise
    */
-  const handleSuccessfulIndexImage = (res) => {
+  const handleIndexImage = (res) => {
     if (res.FaceRecords.length === 1) {
       return res;
     } else if (res.FaceRecords.length > 1) {
@@ -99,7 +101,7 @@ export default (ctx) => {
     })
     .then(searchUserFace)
     .then(indexUserFace)
-    .then(handleSuccessfulIndexImage)
+    .then(handleIndexImage)
     .then(updateUserSchema)
     .catch((err) => {
       if (err.statusCode) {

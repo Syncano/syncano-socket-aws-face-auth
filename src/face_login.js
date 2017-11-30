@@ -8,8 +8,8 @@ export default (ctx) => {
   const awsRekognitionClass = new Rekognition(ctx.config);
 
   const {collectionId, image} = ctx.args;
-  const bucketName = (ctx.args.bucketName || ctx.args.bucketName.trim() !== '')
-    ? ctx.args.bucketName : null;
+  const bucketName = (!ctx.args.bucketName || ctx.args.bucketName.trim() === '')
+    ? null : ctx.args.bucketName;
 
   const handleSearchFacesByImageResult = (res) => {
     if (res.FaceMatches.length === 0) {
@@ -26,8 +26,8 @@ export default (ctx) => {
   const getUser = (res) => {
     return users.where('external_image_id', res.FaceMatches[0].Face.ExternalImageId)
       .firstOrFail()
-      .then((data) => {
-        return response.json({token: data.user_key, username: data.username});
+      .then(({ user_key, username }) => {
+        return response.json({token: user_key, username});
       })
       .catch(() => {
         const message = 'Authentication fail.';
@@ -35,7 +35,8 @@ export default (ctx) => {
       });
   };
 
-  return awsRekognitionClass.searchFacesByImage(collectionId, image, bucketName)
+  return awsRekognitionClass.searchFacesByImage(collectionId, image, bucketName,
+    ctx.config.FACE_MATCH_THRESHOLD)
     .then(handleSearchFacesByImageResult)
     .then(getUser)
     .catch((err) => {

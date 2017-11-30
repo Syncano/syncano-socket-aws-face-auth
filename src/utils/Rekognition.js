@@ -159,7 +159,7 @@ class Rekognition {
    * @param {number} threshold
    * @returns {Promise}
    */
-  async searchFacesByImage(collectionId, image, bucket = null, threshold = 95) {
+  async searchFacesByImage(collectionId, image, bucket = null, threshold) {
     const params = {
       CollectionId: collectionId,
       Image: await Rekognition.getImageParams(image, bucket),

@@ -9,7 +9,8 @@ export default (ctx) => {
     username, token, collectionId, image, bucketName
   } = ctx.args;
 
-  const s3bucket = (bucketName || bucketName.trim() !== '') ? bucketName : null;
+  const s3bucket = (!ctx.args.bucketName || ctx.args.bucketName.trim() === '')
+    ? null : ctx.args.bucketName;
 
   const awsRekognitionClass = new Rekognition(ctx.config);
 
@@ -38,7 +39,8 @@ export default (ctx) => {
    * @returns {Promise.<*>} promise
    */
   const searchUserFaces = (data) => {
-    return awsRekognitionClass.searchFacesByImage(collectionId, image, s3bucket)
+    return awsRekognitionClass.searchFacesByImage(collectionId, image, s3bucket,
+      ctx.config.FACE_MATCH_THRESHOLD)
       .then((res) => {
         if (res.FaceMatches.length > 0) {
           if (res.FaceMatches[0].Face.ExternalImageId !== data.external_image_id) {
