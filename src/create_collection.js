@@ -9,13 +9,13 @@ export default (ctx) => {
 
   return awsRekognitionClass.createCollection(ctx.args.collectionId)
     .then((res) => {
-      response.json({
+      return response.json({
         collectionArn: res.CollectionArn,
         statusCode: res.StatusCode
       });
     })
     .catch((err) => {
-      response.json({
+      return response.json({
         statusCode: err.statusCode,
         code: err.code,
         message: err.message

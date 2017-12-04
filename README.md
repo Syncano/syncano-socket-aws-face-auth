@@ -1,6 +1,7 @@
 # Syncano Socket aws-face-auth
 
-#### NOTE
+### NOTE
+* Use `rest-auth` socket for basic authentication. To add socket `syncano-cli add rest-auth`
 * Create a `.env` on parent folder and copy contents of `.env-sample` to it and add appropriate variables 
 * Create a `.nyc_output` folder on parent directory
     ```
