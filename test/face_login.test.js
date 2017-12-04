@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import request from 'supertest';
 import { assert } from 'chai';
 
