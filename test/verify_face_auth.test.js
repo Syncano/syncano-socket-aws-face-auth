@@ -10,10 +10,6 @@ describe('verify_face_auth', () => {
     'endpoints/sockets/aws-face-auth/verify_face_auth/';
   const requestUrl = request(VERIFY_URL);
 
-  const REGISTER_URL = `https://api.syncano.io/v2/instances/${process.env.INSTANCE_NAME}/` +
-    'endpoints/sockets/rest-auth/register/';
-  const registerUrl = request(REGISTER_URL);
-
   const LOGIN_URL = `https://api.syncano.io/v2/instances/${process.env.INSTANCE_NAME}/` +
     'endpoints/sockets/rest-auth/login/';
   const loginrUrl = request(LOGIN_URL);
