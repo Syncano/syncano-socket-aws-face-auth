@@ -1,21 +1,12 @@
 import { expect, assert } from 'chai';
 import { run } from 'syncano-test';
+import config from './utils/helpers';
 
-import dotenv from 'dotenv';
-
-dotenv.config();
-
-describe('create_collection', () => {
-  const config = {
-    AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID,
-    AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY,
-    AWS_REGION: process.env.AWS_REGION,
-  };
-
-  const args = {collectionId: 'collectionTest'};
+describe('create-collection', () => {
+  const args = { collectionId: 'collectionTest' };
 
   it('with valid collection name', (done) => {
-    run('create_collection', {args, config})
+    run('create-collection', { args, config })
       .then((res) => {
         assert.propertyVal(res, 'code', 200);
         assert.propertyVal(res, 'mimetype', 'application/json');
@@ -30,7 +21,7 @@ describe('create_collection', () => {
   it('without collection name', (done) => {
     const argsWithoutData = {};
 
-    run('create_collection', {args: argsWithoutData, config})
+    run('create-collection', { args: argsWithoutData, config })
       .then((res) => {
         assert.propertyVal(res, 'code', 400);
         assert.propertyVal(res, 'mimetype', 'application/json');

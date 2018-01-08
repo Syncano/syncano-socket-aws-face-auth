@@ -1,38 +1,40 @@
 import request from 'supertest';
 import { assert } from 'chai';
+import 'dotenv/config';
 
-import dotenv from 'dotenv';
+describe('face-register', () => {
+  const {
+    INSTANCE_NAME, AWS_BUCKET_NAME, AWS_S3_USER_IMAGE_KEY, TEST_USER_EMAIL1, TEST_USER_EMAIL2,
+    TEST_USER_PASSWORD
+  } = process.env;
 
-dotenv.config();
-
-describe('face_register', () => {
-  const VERIFY_URL = `https://api.syncano.io/v2/instances/${process.env.INSTANCE_NAME}/` +
-    'endpoints/sockets/aws-face-auth/face_register/';
+  const VERIFY_URL = `https://api.syncano.io/v2/instances/${INSTANCE_NAME}/` +
+    'endpoints/sockets/aws-face-auth/face-register/';
   const requestUrl = request(VERIFY_URL);
 
-  const REGISTER_URL = `https://api.syncano.io/v2/instances/${process.env.INSTANCE_NAME}/` +
+  const REGISTER_URL = `https://api.syncano.io/v2/instances/${INSTANCE_NAME}/` +
     'endpoints/sockets/rest-auth/register/';
   const registerUrl = request(REGISTER_URL);
 
-  const LOGIN_URL = `https://api.syncano.io/v2/instances/${process.env.INSTANCE_NAME}/` +
+  const LOGIN_URL = `https://api.syncano.io/v2/instances/${INSTANCE_NAME}/` +
     'endpoints/sockets/rest-auth/login/';
   const loginrUrl = request(LOGIN_URL);
 
-  const bucketName = process.env.AWS_BUCKET_NAME;
-  const userImage = process.env.AWS_S3_USER_IMAGE_KEY;
+  const bucketName = AWS_BUCKET_NAME;
+  const userImage = AWS_S3_USER_IMAGE_KEY;
   const collectionId = 'collectionTest';
 
-  const firstUserEmail = process.env.TEST_USER_EMAIL1;
-  const secondUserEmail = process.env.TEST_USER_EMAIL2;
-  const userPassword = process.env.TEST_USER_PASSWORD;
+  const firstUserEmail = TEST_USER_EMAIL1;
+  const secondUserEmail = TEST_USER_EMAIL2;
+  const userPassword = TEST_USER_PASSWORD;
 
   before((done) => {
     loginrUrl.post('/')
-      .send({username: firstUserEmail, password: userPassword})
+      .send({ username: firstUserEmail, password: userPassword })
       .then((res) => {
         if (res.status === 400) {
           return registerUrl.post('/')
-            .send({username: firstUserEmail, password: userPassword});
+            .send({ username: firstUserEmail, password: userPassword });
         }
         return { status: true };
       })
@@ -46,11 +48,11 @@ describe('face_register', () => {
 
   before((done) => {
     loginrUrl.post('/')
-      .send({username: secondUserEmail, password: userPassword})
+      .send({ username: secondUserEmail, password: userPassword })
       .then((res) => {
         if (res.status === 400) {
           return registerUrl.post('/')
-            .send({username: secondUserEmail, password: userPassword});
+            .send({ username: secondUserEmail, password: userPassword });
         }
         return { status: true };
       })
@@ -75,6 +77,8 @@ describe('face_register', () => {
         .send(argsWithValidDetails)
         .expect(200)
         .end((err, res) => {
+          console.log(err, 'err>>>>>>>');
+          console.log(res.body, 'result>>>>>>>');
           if (err) return done(err);
           assert.propertyVal(res.body,
             'message', 'User face registered for face authentication.');

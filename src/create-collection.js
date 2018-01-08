@@ -3,7 +3,7 @@ import Syncano from 'syncano-server';
 import Rekognition from './utils/Rekognition';
 
 export default (ctx) => {
-  const {response} = Syncano(ctx);
+  const { response } = Syncano(ctx);
 
   const awsRekognitionClass = new Rekognition(ctx.config);
 

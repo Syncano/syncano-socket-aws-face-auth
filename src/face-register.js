@@ -23,7 +23,7 @@ export default (ctx) => {
    * @param {object} data
    * @returns {Promise.<*>} promise
    */
-  const searchUserFace = ({data}) => {
+  const searchUserFace = ({ data }) => {
     return awsRekognitionClass.searchFacesByImage(collectionId, image, s3bucket,
       ctx.config.FACE_MATCH_THRESHOLD)
       .then((res) => {
@@ -64,7 +64,7 @@ export default (ctx) => {
     const faceIds = res.FaceRecords.map(record => record.Face.FaceId);
     return awsRekognitionClass.deleteFaces(collectionId, faceIds)
       .then(() => {
-        return Promise.reject({message, statusCode: 400});
+        return Promise.reject({ message, statusCode: 400 });
       }).catch(err => Promise.reject({ message: err.message, statusCode: 400 }));
   };
 
@@ -85,7 +85,7 @@ export default (ctx) => {
 
   const updateUserSchema = (res) => {
     users.where('username', username)
-      .update({face_auth: true, external_image_id: res.FaceRecords[0].Face.ExternalImageId })
+      .update({ face_auth: true, external_image_id: res.FaceRecords[0].Face.ExternalImageId })
       .then(() => {
         return response.json({ message: 'User face registered for face authentication.' });
       })
@@ -107,6 +107,8 @@ export default (ctx) => {
       if (err.statusCode) {
         return response.json(err, err.statusCode);
       }
-      return response.json({message: 'Username or password does not match any user account.'}, 401);
+      return response.json(
+        { message: 'Username or password does not match any user account.' }, 401
+      );
     });
 };
