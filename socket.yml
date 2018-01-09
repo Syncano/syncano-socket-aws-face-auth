@@ -98,11 +98,11 @@ endpoints:
     parameters:
       username:
         type: string
-        description: "Username of user"
+        description: "User email"
         example: "you@domain.com"
       password:
         type: string
-        description: "Password of user"
+        description: "User password"
         example: ""
       collectionId:
         type: string

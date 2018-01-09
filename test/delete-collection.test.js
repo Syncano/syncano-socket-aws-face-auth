@@ -3,7 +3,7 @@ import { run } from 'syncano-test';
 import config from './utils/helpers';
 
 describe('delete-collection', () => {
-  const args = { collectionId: 'collectionTest' };
+  const args = { collectionId: 'collectionTest1' };
 
   it('with valid collection name', (done) => {
     run('delete-collection', { args, config })

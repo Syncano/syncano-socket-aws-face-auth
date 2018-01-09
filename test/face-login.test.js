@@ -13,7 +13,7 @@ describe('face-login', () => {
   const requestUrl = request(LOGIN_URL);
 
   const args = {
-    collectionId: 'collectionTest',
+    collectionId: 'collectionTest1',
     image: AWS_S3_USER_IMAGE_KEY,
     bucketName: AWS_BUCKET_NAME
   };

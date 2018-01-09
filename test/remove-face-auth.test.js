@@ -19,7 +19,7 @@ describe('remove-face-auth', () => {
   const bucketName = AWS_BUCKET_NAME;
   const userImage = AWS_S3_USER_IMAGE_KEY;
   const wrongImage = INAVLID_USER_AWS_S3_IMAGE_KEY;
-  const collectionId = 'collectionTest';
+  const collectionId = 'collectionTest1';
 
   const firstUserEmail = TEST_USER_EMAIL1;
   const secondUserEmail = TEST_USER_EMAIL2;
