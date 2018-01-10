@@ -77,8 +77,6 @@ describe('face-register', () => {
         .send(argsWithValidDetails)
         .expect(200)
         .end((err, res) => {
-          console.log(err, 'err>>>>>>>');
-          console.log(res.body, 'result>>>>>>>');
           if (err) return done(err);
           assert.propertyVal(res.body,
             'message', 'User face registered for face authentication.');
