@@ -1,6 +1,6 @@
 name: aws-face-auth
 description: User face authentication socket with aws rekognition. For basic authentication use 'rest-auth' socket
-version: 0.0.11
+version: 0.0.2
 keywords:
   - user
   - face-auth
