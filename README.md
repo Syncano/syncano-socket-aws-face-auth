@@ -1,4 +1,5 @@
 # Syncano Socket aws-face-auth
+[![CircleCI](https://circleci.com/gh/Syncano/syncano-socket-aws-face-auth.svg?style=svg)](https://circleci.com/gh/Syncano/syncano-socket-aws-face-auth)
 
 This socket integrates face authentication with aws rekognition to Syncano.
 
@@ -8,7 +9,7 @@ This socket integrates face authentication with aws rekognition to Syncano.
 syncano-cli add aws-face-auth
 ```
 
-### Dependent Socket
+### Dependencies
 * **rest-auth socket**
     
     Since there can be no authentication without first registering to a system, it is important to use the `rest-auth` socket for basic registration.
@@ -150,4 +151,20 @@ This endpoint checks if face authentication is enabled on user account
   is_face_auth: true
 }
 ```
+
+### Contributing
+
+#### How to Contribute
+  * Fork this repository
+  * Clone from your fork
+  * Make your contributions (Make sure your work is well tested)
+  * Create Pull request from the fork to this repo
+
+#### Setting up environment variables
+  * Create a `.env` on parent folder
+  * Copy contents of `.env-sample` file to newly created `.env` file and assign appropriate values to the listed variables.
+
+#### Testing
+  * Ensure all your test are written on the `test` directory
+  * Use the command `npm test` to run test
 
