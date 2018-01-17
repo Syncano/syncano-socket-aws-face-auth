@@ -3,7 +3,7 @@ import Syncano from 'syncano-server';
 import Rekognition from './utils/Rekognition';
 
 export default (ctx) => {
-  const {response, users} = Syncano(ctx);
+  const { response, users } = Syncano(ctx);
 
   const {
     username, token, collectionId, image, bucketName
@@ -25,7 +25,7 @@ export default (ctx) => {
         message: 'Given credentials does not match any user account.', statusCode: 401
       });
     }
-    if (data.face_auth === false || data.face_auth === null) {
+    if (!data.face_auth) {
       return Promise.reject({
         message: 'Face authentication not enabled for user account.', statusCode: 400
       });
@@ -50,7 +50,7 @@ export default (ctx) => {
           }
           return res;
         }
-        return Promise.reject({message: 'Face image not tied to this account.', statusCode: 400});
+        return Promise.reject({ message: 'Face image not tied to this account.', statusCode: 400 });
       })
       .catch(err => Promise.reject({ message: err.message, statusCode: 400 }));
   };
@@ -73,7 +73,7 @@ export default (ctx) => {
 
   const updateUserSchema = () => {
     users.where('username', username)
-      .update({face_auth: false, external_image_id: '' })
+      .update({ face_auth: false, external_image_id: '' })
       .then(() => response.json({ message: 'User account removed from face authentication.' }))
       .catch((err) => {
         const message = (err.data) ? err.data : err.message;

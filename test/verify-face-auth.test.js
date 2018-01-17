@@ -1,35 +1,37 @@
 import request from 'supertest';
 import { assert } from 'chai';
-import dotenv from 'dotenv';
+import 'dotenv/config';
 
-dotenv.config();
+describe('verify-face-auth', () => {
+  const {
+    INSTANCE_NAME, AWS_BUCKET_NAME, AWS_S3_USER_IMAGE_KEY, TEST_USER_EMAIL1, TEST_USER_EMAIL2,
+    TEST_USER_PASSWORD
+  } = process.env;
 
-
-describe('verify_face_auth', () => {
-  const VERIFY_URL = `https://api.syncano.io/v2/instances/${process.env.INSTANCE_NAME}/` +
-    'endpoints/sockets/aws-face-auth/verify_face_auth/';
+  const VERIFY_URL = `https://api.syncano.io/v2/instances/${INSTANCE_NAME}/` +
+    'endpoints/sockets/aws-face-auth/verify-face-auth/';
   const requestUrl = request(VERIFY_URL);
 
-  const LOGIN_URL = `https://api.syncano.io/v2/instances/${process.env.INSTANCE_NAME}/` +
+  const LOGIN_URL = `https://api.syncano.io/v2/instances/${INSTANCE_NAME}/` +
     'endpoints/sockets/rest-auth/login/';
   const loginrUrl = request(LOGIN_URL);
 
-  const firstUserEmail = process.env.TEST_USER_EMAIL1;
-  const secondUserEmail = process.env.TEST_USER_EMAIL2;
-  const userPassword = process.env.TEST_USER_PASSWORD;
+  const firstUserEmail = TEST_USER_EMAIL1;
+  const secondUserEmail = TEST_USER_EMAIL2;
+  const userPassword = TEST_USER_PASSWORD;
   let firstUserToken = '';
   let secondUserToken = '';
 
   before((done) => {
     loginrUrl.post('/')
-      .send({username: firstUserEmail, password: userPassword})
+      .send({ username: firstUserEmail, password: userPassword })
       .then((res) => {
         // if first user login successful set firstUserToken
         if (res.status === 200) {
           firstUserToken = res.body.token;
         }
         return loginrUrl.post('/')
-          .send({username: secondUserEmail, password: userPassword});
+          .send({ username: secondUserEmail, password: userPassword });
       })
       .then((res) => {
         // if second user login successful set secondUserToken

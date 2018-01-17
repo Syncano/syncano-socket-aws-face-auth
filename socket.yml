@@ -1,6 +1,6 @@
 name: aws-face-auth
 description: User face authentication socket with aws rekognition. For basic authentication use 'rest-auth' socket
-version: 0.0.1
+version: 0.0.2
 keywords:
   - user
   - face-auth
@@ -38,7 +38,7 @@ classes:
       type: string
       filter_index: true
 endpoints:
-  create_collection:
+  create-collection:
     description: Creates a collection in an AWS Region
     parameters:
       collectionId:
@@ -65,7 +65,7 @@ endpoints:
               "code": "ResourceAlreadyExistsException",
               "message":"A collection with the specified ID already exists."
             }
-  delete_collection:
+  delete-collection:
     description: Deletes a collection in an AWS Region
     parameters:
       collectionId:
@@ -91,18 +91,18 @@ endpoints:
               "code": "AccessDeniedException",
               "message":"You are not authorized to perform the action."
             }
-  face_register:
+  face-register:
     description: Register face to existing user account for face authentication.
     long_description: >
       Client-side to send user's username and password(expected user to approve by confirming password) to register face to user's account.
     parameters:
       username:
         type: string
-        description: "Username of user"
+        description: "User email"
         example: "you@domain.com"
       password:
         type: string
-        description: "Password of user"
+        description: "User password"
         example: ""
       collectionId:
         type: string
@@ -131,7 +131,7 @@ endpoints:
             {
               message: "Fail to register face."
             }
-  face_login:
+  face-login:
     description: Login to a user account using face image
     parameters:
       collectionId:
@@ -162,7 +162,7 @@ endpoints:
             {
               message: "Authentication fail."
             }
-  remove_face_auth:
+  remove-face-auth:
     description: Remove face authentication for particular user
     parameters:
       username:
@@ -200,7 +200,7 @@ endpoints:
             {
               message: "Face authentication not enabled for user account."
             }
-  verify_face_auth:
+  verify-face-auth:
     description: Checks if user face authentication is enabled
     parameters:
       username:

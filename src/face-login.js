@@ -3,11 +3,11 @@ import Syncano from 'syncano-server';
 import Rekognition from './utils/Rekognition';
 
 export default (ctx) => {
-  const {response, users } = Syncano(ctx);
+  const { response, users } = Syncano(ctx);
 
   const awsRekognitionClass = new Rekognition(ctx.config);
 
-  const {collectionId, image} = ctx.args;
+  const { collectionId, image } = ctx.args;
   const bucketName = (!ctx.args.bucketName || ctx.args.bucketName.trim() === '')
     ? null : ctx.args.bucketName;
 
@@ -27,7 +27,7 @@ export default (ctx) => {
     return users.where('external_image_id', res.FaceMatches[0].Face.ExternalImageId)
       .firstOrFail()
       .then(({ user_key, username }) => {
-        return response.json({token: user_key, username});
+        return response.json({ token: user_key, username });
       })
       .catch(() => {
         const message = 'Authentication fail.';
