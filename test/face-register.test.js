@@ -4,8 +4,9 @@ import 'dotenv/config';
 
 describe('face-register', () => {
   const {
-    INSTANCE_NAME, AWS_BUCKET_NAME, AWS_S3_USER_IMAGE_KEY, TEST_USER_EMAIL1, TEST_USER_EMAIL2,
-    TEST_USER_PASSWORD
+    INSTANCE_NAME, AWS_BUCKET_NAME: bucketName, AWS_S3_USER_IMAGE_KEY: userImage,
+    TEST_USER_EMAIL1: firstUserEmail, TEST_USER_EMAIL2: secondUserEmail,
+    TEST_USER_PASSWORD: userPassword, COLLECTION_ID: collectionId
   } = process.env;
 
   const VERIFY_URL = `https://api.syncano.io/v2/instances/${INSTANCE_NAME}/` +
@@ -19,14 +20,6 @@ describe('face-register', () => {
   const LOGIN_URL = `https://api.syncano.io/v2/instances/${INSTANCE_NAME}/` +
     'endpoints/sockets/rest-auth/login/';
   const loginrUrl = request(LOGIN_URL);
-
-  const bucketName = AWS_BUCKET_NAME;
-  const userImage = AWS_S3_USER_IMAGE_KEY;
-  const collectionId = 'collectionTest1';
-
-  const firstUserEmail = TEST_USER_EMAIL1;
-  const secondUserEmail = TEST_USER_EMAIL2;
-  const userPassword = TEST_USER_PASSWORD;
 
   before((done) => {
     loginrUrl.post('/')
@@ -141,6 +134,18 @@ describe('face-register', () => {
         if (err) return done(err);
         assert.propertyVal(res.body,
           'message', 'Image must consist of only one person\'s face');
+        done();
+      });
+  });
+
+  it('should return message "Validation error(s)" if username parameter is empty', (done) => {
+    const argsValidation = { username: '', password: userPassword, collectionId };
+    requestUrl.post('/')
+      .send(argsValidation)
+      .expect(400)
+      .end((err, res) => {
+        if (err) return done(err);
+        assert.propertyVal(res.body, 'message', 'Validation error(s)');
         done();
       });
   });

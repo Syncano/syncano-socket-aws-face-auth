@@ -109,5 +109,18 @@ describe('verify-face-auth', () => {
             done();
           });
       });
+
+
+    it('should return message "Validation error(s)" if token parameter is empty', (done) => {
+      const argsValidation = { username: firstUserEmail, token: '' };
+      requestUrl.post('/')
+        .send(argsValidation)
+        .expect(400)
+        .end((err, res) => {
+          if (err) return done(err);
+          assert.propertyVal(res.body, 'message', 'Validation error(s)');
+          done();
+        });
+    });
   });
 });

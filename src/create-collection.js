@@ -15,13 +15,14 @@ export default async (ctx) => {
     const result = await awsRekognitionClass.createCollection(collectionId);
     return response.json({ collectionArn: result.CollectionArn, statusCode: result.StatusCode });
   } catch (err) {
-    if (err.customMessage) {
-      return response.json({ message: err.customMessage, details: err.details }, 400);
+    const { customMessage, details, statusCode, code, message } = err;
+    if (customMessage) {
+      return response.json({ message: customMessage, details }, 400);
     }
-    if (err.code) {
-      return response.json({ statusCode: err.statusCode, code: err.code, message: err.message },
+    if (code) {
+      return response.json({ statusCode, code, message },
         400);
     }
-    return response.json({ message: err.message }, 400);
+    return response.json({ message }, 400);
   }
 };

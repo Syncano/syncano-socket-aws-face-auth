@@ -4,8 +4,10 @@ import 'dotenv/config';
 
 describe('remove-face-auth', () => {
   const {
-    INSTANCE_NAME, AWS_BUCKET_NAME, AWS_S3_USER_IMAGE_KEY, TEST_USER_EMAIL1, TEST_USER_EMAIL2,
-    TEST_USER_PASSWORD, INAVLID_USER_AWS_S3_IMAGE_KEY
+    INSTANCE_NAME, AWS_BUCKET_NAME: bucketName, AWS_S3_USER_IMAGE_KEY: userImage,
+    TEST_USER_EMAIL1: firstUserEmail, TEST_USER_EMAIL2: secondUserEmail,
+    TEST_USER_PASSWORD: userPassword, COLLECTION_ID: collectionId,
+    INAVLID_USER_AWS_S3_IMAGE_KEY: wrongImage
   } = process.env;
 
   const REMOVE_URL = `https://api.syncano.io/v2/instances/${INSTANCE_NAME}/` +
@@ -16,16 +18,7 @@ describe('remove-face-auth', () => {
     'endpoints/sockets/rest-auth/login/';
   const loginrUrl = request(LOGIN_URL);
 
-  const bucketName = AWS_BUCKET_NAME;
-  const userImage = AWS_S3_USER_IMAGE_KEY;
-  const wrongImage = INAVLID_USER_AWS_S3_IMAGE_KEY;
-  const collectionId = 'collectionTest1';
-
-  const firstUserEmail = TEST_USER_EMAIL1;
-  const secondUserEmail = TEST_USER_EMAIL2;
-  const userPassword = TEST_USER_PASSWORD;
-  let firstUserToken = '';
-  let secondUserToken = '';
+  let firstUserToken, secondUserToken = '';
 
   before((done) => {
     loginrUrl.post('/')
@@ -154,5 +147,17 @@ describe('remove-face-auth', () => {
             done();
           });
       });
+
+    it('should return message "Validation error(s)" if username parameter is empty', (done) => {
+      const argsValidation = { username: '', token: 'tokenString' };
+      requestUrl.post('/')
+        .send(argsValidation)
+        .expect(400)
+        .end((err, res) => {
+          if (err) return done(err);
+          assert.propertyVal(res.body, 'message', 'Validation error(s)');
+          done();
+        });
+    });
   });
 });

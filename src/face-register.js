@@ -2,17 +2,23 @@ import Syncano from 'syncano-server';
 import axios from 'axios';
 import uuidv1 from 'uuid/v1';
 
+import { validateRequired } from './utils/helpers';
 import Rekognition from './utils/Rekognition';
 
 export default (ctx) => {
   const { users, response } = Syncano(ctx);
 
-  const {
-    username, password, collectionId, image
-  } = ctx.args;
+  const { username, password, image, bucketName } = ctx.args;
+  const { collectionId } = ctx.config;
 
-  const s3bucket = (!ctx.args.bucketName || ctx.args.bucketName.trim() === '')
-    ? null : ctx.args.bucketName;
+  const s3bucket = (!bucketName || bucketName.trim() === '') ? null : bucketName;
+
+  try {
+    validateRequired({ username, password, image });
+  } catch (err) {
+    const { customMessage, details } = err;
+    return response.json({ message: customMessage, details }, 400);
+  }
 
   const AUTH_URL = `https://api.syncano.io/v2/instances/${ctx.meta.instance}/users/auth/`;
 

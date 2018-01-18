@@ -1,15 +1,23 @@
 import Syncano from 'syncano-server';
 
+import { validateRequired } from './utils/helpers';
 import Rekognition from './utils/Rekognition';
 
 export default (ctx) => {
   const { response, users } = Syncano(ctx);
 
-  const awsRekognitionClass = new Rekognition(ctx.config);
+  const { image, bucketName } = ctx.args;
+  const { collectionId } = ctx.config;
+  const s3Bucket = (!bucketName || bucketName.trim() === '') ? null : bucketName;
 
-  const { collectionId, image } = ctx.args;
-  const bucketName = (!ctx.args.bucketName || ctx.args.bucketName.trim() === '')
-    ? null : ctx.args.bucketName;
+  try {
+    validateRequired({ image });
+  } catch (err) {
+    const { customMessage, details } = err;
+    return response.json({ message: customMessage, details }, 400);
+  }
+
+  const awsRekognitionClass = new Rekognition(ctx.config);
 
   const handleSearchFacesByImageResult = (res) => {
     if (res.FaceMatches.length === 0) {
@@ -35,7 +43,7 @@ export default (ctx) => {
       });
   };
 
-  return awsRekognitionClass.searchFacesByImage(collectionId, image, bucketName,
+  return awsRekognitionClass.searchFacesByImage(collectionId, image, s3Bucket,
     ctx.config.FACE_MATCH_THRESHOLD)
     .then(handleSearchFacesByImageResult)
     .then(getUser)

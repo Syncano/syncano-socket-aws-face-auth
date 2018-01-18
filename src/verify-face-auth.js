@@ -1,9 +1,17 @@
 import Syncano from 'syncano-server';
+import { validateRequired } from './utils/helpers';
 
 export default (ctx) => {
   const { response, users } = Syncano(ctx);
 
   const { username, token } = ctx.args;
+
+  try {
+    validateRequired({ username, token });
+  } catch (err) {
+    const { customMessage, details } = err;
+    return response.json({ message: customMessage, details }, 400);
+  }
 
   /**
    * Check if face auth is enabled in user account

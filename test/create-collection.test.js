@@ -22,7 +22,6 @@ describe('create-collection', () => {
   it('should fail if collectionId is already existing', (done) => {
     run('create-collection', { args, config })
       .then((res) => {
-        console.log(res.data, 'meee');
         assert.propertyVal(res, 'code', 400);
         assert.property(res.data, 'message');
         assert.propertyVal(res.data, 'code', 'ResourceAlreadyExistsException');
@@ -38,7 +37,6 @@ describe('create-collection', () => {
       const argsWithoutCollectionId = { ...args, collectionId: '' };
       run('create-collection', { args: argsWithoutCollectionId, config })
         .then((res) => {
-          console.log(res.data);
           assert.propertyVal(res, 'code', 400);
           assert.propertyVal(res, 'mimetype', 'application/json');
           assert.propertyVal(res.data, 'message', 'Validation error(s)');

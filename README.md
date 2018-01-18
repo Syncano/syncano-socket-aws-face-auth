@@ -31,6 +31,8 @@ This endpoint creates a collection where face indexes will be stored in AWS Reko
 | Name          | Type      | Description  | Example
 | ------------- |----------| ------------| ---------
 | collectionId  | string   | ID for the collection that you are creating | SyncanoFaces
+| accessKeyId  | string   | AWS access key id |
+| secretAccessKey  | string   | AWS secret access key |
 
 *_Response_*
 
@@ -51,6 +53,8 @@ This endpoint deletes a collection in AWS Rekognition.
 | Name          | Type      | Description  | Example
 | ------------- |-----------| ------------| ---------
 | collectionId  | string   | ID for the collection that you are deleting | SyncanoFaces
+| accessKeyId  | string   | AWS access key id |
+| secretAccessKey  | string   | AWS secret access key |
 
 *_Response_*
 
@@ -72,7 +76,6 @@ User required to input password as extra check when registering face to account.
 | ------------- |-----------| ------------| ---------
 | username      | string   | User email   | you@domain.com
 | password     | string    | User password | user-password
-| collectionId | string    | Id collection to keep indexed image | SyncanoFaces
 | image        | string    | Path to image or an S3 object key | image.jpg
 | bucketName   | string    | Name of s3 bucket. Leave empty if image not on s3 bucket  | s3-bucket.
 
@@ -93,7 +96,6 @@ This endpoint login a user using face image.
 
 | Name          | Type      | Description  | Example
 | ------------- |-----------| ------------| ---------
-| collectionId | string    | Id collection to keep indexed image | SyncanoFaces
 | image        | string    | Path to image or an S3 object key | image.jpg
 | bucketName   | string    | Name of s3 bucket. Leave empty if image not on s3 bucket  | s3-bucket.
 
@@ -117,7 +119,6 @@ This endpoint removes face authentication on user account
 | ------------- |-----------| ------------| ---------
 | username      | string   | User email   | you@domain.com
 | token     | string    | User token | cb21fac8c7dda8fcd0129b0adb0254dea5c8e
-| collectionId | string    | Id collection to keep indexed image | SyncanoFaces
 | image        | string    | Path to image or an S3 object key | image.jpg
 | bucketName   | string    | Name of s3 bucket. Leave empty if image not on s3 bucket  | s3-bucket.
 

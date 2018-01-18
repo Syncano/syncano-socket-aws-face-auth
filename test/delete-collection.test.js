@@ -41,7 +41,6 @@ describe('delete-collection', () => {
       const argsWithoutCollectionId = { ...args, collectionId: '' };
       run('delete-collection', { args: argsWithoutCollectionId, config })
         .then((res) => {
-          console.log(res.data, 'for delete');
           assert.propertyVal(res, 'code', 400);
           assert.propertyVal(res, 'mimetype', 'application/json');
           assert.propertyVal(res.data, 'message', 'Validation error(s)');

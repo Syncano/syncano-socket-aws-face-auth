@@ -1,16 +1,22 @@
 import Syncano from 'syncano-server';
 
+import { validateRequired } from './utils/helpers';
 import Rekognition from './utils/Rekognition';
 
 export default (ctx) => {
   const { response, users } = Syncano(ctx);
 
-  const {
-    username, token, collectionId, image, bucketName
-  } = ctx.args;
+  const { username, token, image, bucketName } = ctx.args;
+  const { collectionId } = ctx.config;
 
-  const s3bucket = (!ctx.args.bucketName || ctx.args.bucketName.trim() === '')
-    ? null : ctx.args.bucketName;
+  const s3bucket = (!bucketName || bucketName.trim() === '') ? null : bucketName;
+
+  try {
+    validateRequired({ username, token, image });
+  } catch (err) {
+    const { customMessage, details } = err;
+    return response.json({ message: customMessage, details }, 400);
+  }
 
   const awsRekognitionClass = new Rekognition(ctx.config);
 
