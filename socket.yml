@@ -25,6 +25,9 @@ config:
       Visit link to know more about managing keys
       (http://docs.aws.amazon.com/general/latest/gr/managing-aws-access-keys.html).
     required: true
+  COLLECTION_ID:
+    description: ID of the collection to store face indexes.
+    required: true
   FACE_MATCH_THRESHOLD:
     description: Specifies the minimum confidence in the face match to return. Minimum value of 0 and Maximum value of 100.
     required: true
@@ -45,6 +48,12 @@ endpoints:
         type: string
         description: "ID for the collection that you are creating"
         example: "SyncanoFaces"
+      accessKeyId:
+        type: string
+        description: "AWS access key id"
+      secretAccessKey:
+        type: string
+        description: "AWS secret access key"
     response:
       mimetype: application/json
       examples:
@@ -72,6 +81,12 @@ endpoints:
         type: string
         description: "ID of the collection to delete"
         example: "SyncanoFaces"
+      accessKeyId:
+        type: string
+        description: "AWS access key id"
+      secretAccessKey:
+        type: string
+        description: "AWS secret access key"
     response:
       mimetype: application/json
       examples:
@@ -104,10 +119,6 @@ endpoints:
         type: string
         description: "User password"
         example: ""
-      collectionId:
-        type: string
-        description: "ID of the collection"
-        example: "SyncanoFaces"
       image:
         type: string
         description: "Path to image or an S3 object key"
@@ -134,10 +145,6 @@ endpoints:
   face-login:
     description: Login to a user account using face image
     parameters:
-      collectionId:
-        type: string
-        description: "ID of the collection"
-        example: "SyncanoFaces"
       image:
         type: string
         description: "Path to image or an S3 object key"
@@ -173,10 +180,6 @@ endpoints:
         type: string
         description: "User token"
         example: "cb21fac8c7dda8fcd0129b0adb0254dea5c8e"
-      collectionId:
-        type: string
-        description: "ID of the collection"
-        example: "SyncanoFaces"
       image:
         type: string
         description: "Path to image or an S3 object key"
