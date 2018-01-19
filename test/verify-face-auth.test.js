@@ -4,9 +4,8 @@ import 'dotenv/config';
 
 describe('verify-face-auth', () => {
   const {
-    INSTANCE_NAME, AWS_BUCKET_NAME, AWS_S3_USER_IMAGE_KEY, TEST_USER_EMAIL1, TEST_USER_EMAIL2,
-    TEST_USER_PASSWORD
-  } = process.env;
+    INSTANCE_NAME, TEST_USER_EMAIL1: firstUserEmail, TEST_USER_EMAIL2: secondUserEmail,
+    TEST_USER_PASSWORD: userPassword } = process.env;
 
   const VERIFY_URL = `https://api.syncano.io/v2/instances/${INSTANCE_NAME}/` +
     'endpoints/sockets/aws-face-auth/verify-face-auth/';
@@ -16,11 +15,7 @@ describe('verify-face-auth', () => {
     'endpoints/sockets/rest-auth/login/';
   const loginrUrl = request(LOGIN_URL);
 
-  const firstUserEmail = TEST_USER_EMAIL1;
-  const secondUserEmail = TEST_USER_EMAIL2;
-  const userPassword = TEST_USER_PASSWORD;
-  let firstUserToken = '';
-  let secondUserToken = '';
+  let firstUserToken, secondUserToken = '';
 
   before((done) => {
     loginrUrl.post('/')

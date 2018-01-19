@@ -6,8 +6,7 @@ describe('remove-face-auth', () => {
   const {
     INSTANCE_NAME, AWS_BUCKET_NAME: bucketName, AWS_S3_USER_IMAGE_KEY: userImage,
     TEST_USER_EMAIL1: firstUserEmail, TEST_USER_EMAIL2: secondUserEmail,
-    TEST_USER_PASSWORD: userPassword, COLLECTION_ID: collectionId,
-    INAVLID_USER_AWS_S3_IMAGE_KEY: wrongImage
+    TEST_USER_PASSWORD: userPassword, INAVLID_USER_AWS_S3_IMAGE_KEY: wrongImage
   } = process.env;
 
   const REMOVE_URL = `https://api.syncano.io/v2/instances/${INSTANCE_NAME}/` +
@@ -50,7 +49,6 @@ describe('remove-face-auth', () => {
       const argsUserFaceAuthNotRegistered = {
         username: secondUserEmail,
         token: secondUserToken,
-        collectionId,
         image: userImage,
         bucketName,
       };
@@ -71,7 +69,6 @@ describe('remove-face-auth', () => {
         const argsUserFaceRegisteredWrongImage = {
           username: firstUserEmail,
           token: firstUserToken,
-          collectionId,
           image: wrongImage,
           bucketName,
         };
@@ -90,7 +87,6 @@ describe('remove-face-auth', () => {
         const argsUserFaceRegistered = {
           username: firstUserEmail,
           token: firstUserToken,
-          collectionId,
           image: userImage,
           bucketName,
         };
@@ -113,7 +109,6 @@ describe('remove-face-auth', () => {
         const argsInvalidUsername = {
           username: 'you22lllll@gmail.com',
           token: '11e118aa4eefeff12ab6d1',
-          collectionId,
           image: userImage,
           bucketName,
         };
@@ -133,7 +128,6 @@ describe('remove-face-auth', () => {
         const argsInvalidUserToken = {
           username: firstUserEmail,
           token: '11e118aa4eefeff12ab6d18a6de930787',
-          collectionId,
           image: userImage,
           bucketName,
         };

@@ -5,7 +5,7 @@ import 'dotenv/config';
 describe('face-login', () => {
   const {
     INSTANCE_NAME, AWS_BUCKET_NAME, AWS_S3_USER_IMAGE_KEY, USER_IMAGE_PATH,
-    INAVLID_USER_AWS_S3_IMAGE_KEY, COLLECTION_ID: collectionId
+    INAVLID_USER_AWS_S3_IMAGE_KEY
   } = process.env;
 
   const LOGIN_URL = `https://api.syncano.io/v2/instances/${INSTANCE_NAME}/` +
@@ -13,7 +13,6 @@ describe('face-login', () => {
   const requestUrl = request(LOGIN_URL);
 
   const args = {
-    collectionId,
     image: AWS_S3_USER_IMAGE_KEY,
     bucketName: AWS_BUCKET_NAME
   };

@@ -1,12 +1,12 @@
 import { expect, assert } from 'chai';
 import { run } from 'syncano-test';
-import { config, collectionId } from './utils/helpers';
+import config from './utils/helpers';
 
 describe('delete-collection', () => {
   const { AWS_ACCESS_KEY_ID: accessKeyId, AWS_SECRET_ACCESS_KEY: secretAccessKey } = config;
-  const args = { collectionId, accessKeyId, secretAccessKey };
+  const args = { collectionId: 'testCollection', accessKeyId, secretAccessKey };
 
-  it('with valid collection name', (done) => {
+  it('should delete collection if valid collectionId parameter is valid', (done) => {
     run('delete-collection', { args, config })
       .then((res) => {
         assert.propertyVal(res, 'code', 200);
@@ -19,7 +19,7 @@ describe('delete-collection', () => {
       });
   });
 
-  it('with collection name that does not exist', (done) => {
+  it('should return "ResourceNotFoundException" error if collectionId does not exist', (done) => {
     const argsWithNonExistingName = { ...args, collectionId: 'nonExistingName' };
 
     run('delete-collection', { args: argsWithNonExistingName, config })

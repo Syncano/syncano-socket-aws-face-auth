@@ -7,7 +7,7 @@ export default (ctx) => {
   const { response, users } = Syncano(ctx);
 
   const { image, bucketName } = ctx.args;
-  const { collectionId } = ctx.config;
+  const { COLLECTION_ID: collectionId, FACE_MATCH_THRESHOLD: faceMatchThreshold } = ctx.config;
   const s3Bucket = (!bucketName || bucketName.trim() === '') ? null : bucketName;
 
   try {
@@ -43,8 +43,7 @@ export default (ctx) => {
       });
   };
 
-  return awsRekognitionClass.searchFacesByImage(collectionId, image, s3Bucket,
-    ctx.config.FACE_MATCH_THRESHOLD)
+  return awsRekognitionClass.searchFacesByImage(collectionId, image, s3Bucket, faceMatchThreshold)
     .then(handleSearchFacesByImageResult)
     .then(getUser)
     .catch((err) => {

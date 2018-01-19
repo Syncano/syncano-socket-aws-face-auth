@@ -6,7 +6,7 @@ describe('face-register', () => {
   const {
     INSTANCE_NAME, AWS_BUCKET_NAME: bucketName, AWS_S3_USER_IMAGE_KEY: userImage,
     TEST_USER_EMAIL1: firstUserEmail, TEST_USER_EMAIL2: secondUserEmail,
-    TEST_USER_PASSWORD: userPassword, COLLECTION_ID: collectionId
+    TEST_USER_PASSWORD: userPassword
   } = process.env;
 
   const VERIFY_URL = `https://api.syncano.io/v2/instances/${INSTANCE_NAME}/` +
@@ -62,7 +62,6 @@ describe('face-register', () => {
       const argsWithValidDetails = {
         username: firstUserEmail,
         password: userPassword,
-        collectionId,
         image: userImage,
         bucketName,
       };
@@ -70,7 +69,10 @@ describe('face-register', () => {
         .send(argsWithValidDetails)
         .expect(200)
         .end((err, res) => {
-          if (err) return done(err);
+          if (err) {
+            console.log(err);
+            return done(err);
+          }
           assert.propertyVal(res.body,
             'message', 'User face registered for face authentication.');
           done();
@@ -82,7 +84,6 @@ describe('face-register', () => {
       const argsWithUsedImage = {
         username: secondUserEmail,
         password: userPassword,
-        collectionId,
         image: userImage,
         bucketName,
       };
@@ -102,7 +103,6 @@ describe('face-register', () => {
       const argsInvalidUser = {
         username: firstUserEmail,
         password: '11e118aa4esdkdkskdk',
-        collectionId,
         image: userImage,
         bucketName,
       };
@@ -123,7 +123,6 @@ describe('face-register', () => {
     const argsMultipleFaces = {
       username: firstUserEmail,
       password: userPassword,
-      collectionId,
       image: 'https://i2-prod.mirror.co.uk/incoming/article7030947.ece/ALTERNATES/s615/Chelsea-main.jpg',
       bucketName: '',
     };
@@ -139,7 +138,7 @@ describe('face-register', () => {
   });
 
   it('should return message "Validation error(s)" if username parameter is empty', (done) => {
-    const argsValidation = { username: '', password: userPassword, collectionId };
+    const argsValidation = { username: '', password: userPassword };
     requestUrl.post('/')
       .send(argsValidation)
       .expect(400)

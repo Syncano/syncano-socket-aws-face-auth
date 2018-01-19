@@ -1,10 +1,10 @@
 import { expect, assert } from 'chai';
 import { run } from 'syncano-test';
-import { config, collectionId } from './utils/helpers';
+import config from './utils/helpers';
 
 describe('create-collection', () => {
   const { AWS_ACCESS_KEY_ID: accessKeyId, AWS_SECRET_ACCESS_KEY: secretAccessKey } = config;
-  const args = { collectionId, accessKeyId, secretAccessKey };
+  const args = { collectionId: 'testCollection', accessKeyId, secretAccessKey };
 
   it('should create collection if valid collectionId parameter supplied', (done) => {
     run('create-collection', { args, config })
