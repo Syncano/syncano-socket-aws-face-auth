@@ -1,5 +1,5 @@
 import Syncano from 'syncano-server';
-import { validateRequired } from './utils/helpers';
+import validateRequired from './utils/helpers';
 
 export default (ctx) => {
   const { response, users } = Syncano(ctx);

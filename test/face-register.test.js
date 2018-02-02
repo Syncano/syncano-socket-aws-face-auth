@@ -70,7 +70,6 @@ describe('face-register', () => {
         .expect(200)
         .end((err, res) => {
           if (err) {
-            console.log(err);
             return done(err);
           }
           assert.propertyVal(res.body,

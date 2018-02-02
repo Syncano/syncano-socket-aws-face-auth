@@ -42,18 +42,12 @@ classes:
       filter_index: true
 endpoints:
   create-collection:
-    description: Creates a collection in an AWS Region
+    description: Creates a collection in an AWS Region (Admin only)
     parameters:
       collectionId:
         type: string
         description: "ID for the collection that you are creating"
         example: "SyncanoFaces"
-      accessKeyId:
-        type: string
-        description: "AWS access key id"
-      secretAccessKey:
-        type: string
-        description: "AWS secret access key"
     response:
       mimetype: application/json
       examples:
@@ -75,18 +69,12 @@ endpoints:
               "message":"A collection with the specified ID already exists."
             }
   delete-collection:
-    description: Deletes a collection in an AWS Region
+    description: Deletes a collection in an AWS Region (Admin only)
     parameters:
       collectionId:
         type: string
         description: "ID of the collection to delete"
         example: "SyncanoFaces"
-      accessKeyId:
-        type: string
-        description: "AWS access key id"
-      secretAccessKey:
-        type: string
-        description: "AWS secret access key"
     response:
       mimetype: application/json
       examples:

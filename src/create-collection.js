@@ -1,15 +1,16 @@
 import Syncano from 'syncano-server';
 
-import { checkAccess, validateRequired } from './utils/helpers';
+import validateRequired from './utils/helpers';
 import Rekognition from './utils/Rekognition';
 
 export default async (ctx) => {
   const { response } = Syncano(ctx);
-  const { collectionId, accessKeyId, secretAccessKey } = ctx.args;
-  const { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY } = ctx.config;
+  const { collectionId } = ctx.args;
   try {
-    validateRequired({ collectionId, accessKeyId, secretAccessKey });
-    checkAccess(accessKeyId, secretAccessKey, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY);
+    if (!ctx.meta.admin) {
+      return response.json({ message: 'You are not authorised for this action' }, 403);
+    }
+    validateRequired({ collectionId });
 
     const awsRekognitionClass = new Rekognition(ctx.config);
     const result = await awsRekognitionClass.createCollection(collectionId);

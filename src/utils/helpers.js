@@ -20,13 +20,4 @@ const validateRequired = (obj, customMessage = 'Validation error(s)', statusCode
   }
 };
 
-const checkAccess = (accessKeyId, secretAccessKey, configAccessKeyId, configSecretAccessKey) => {
-  if (accessKeyId !== configAccessKeyId || secretAccessKey !== configSecretAccessKey) {
-    throw ({ message: 'Provide valid `accessKeyId` and `secretAccessKey` to access endpoint' });
-  }
-};
-
-export {
-  validateRequired,
-  checkAccess
-};
+export default validateRequired;

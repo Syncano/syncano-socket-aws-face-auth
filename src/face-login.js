@@ -1,6 +1,6 @@
 import Syncano from 'syncano-server';
 
-import { validateRequired } from './utils/helpers';
+import validateRequired from './utils/helpers';
 import Rekognition from './utils/Rekognition';
 
 export default (ctx) => {

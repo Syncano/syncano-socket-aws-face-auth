@@ -24,15 +24,13 @@ syncano-cli add aws-face-auth
 
 #### create-collection
 
-This endpoint creates a collection where face indexes will be stored in AWS Rekognition.
+This endpoint creates a collection where face indexes will be stored in AWS Rekognition (Admin only).
 
 *_Parameters_*
 
 | Name          | Type      | Description  | Example
 | ------------- |----------| ------------| ---------
 | collectionId  | string   | ID for the collection that you are creating | SyncanoFaces
-| accessKeyId  | string   | AWS access key id |
-| secretAccessKey  | string   | AWS secret access key |
 
 *_Response_*
 
@@ -45,7 +43,7 @@ This endpoint creates a collection where face indexes will be stored in AWS Reko
 
 #### delete-collection
 
-This endpoint deletes a collection in AWS Rekognition.
+This endpoint deletes a collection in AWS Rekognition (Admin only).
 
 *_Parameters_*
 
@@ -53,8 +51,6 @@ This endpoint deletes a collection in AWS Rekognition.
 | Name          | Type      | Description  | Example
 | ------------- |-----------| ------------| ---------
 | collectionId  | string   | ID for the collection that you are deleting | SyncanoFaces
-| accessKeyId  | string   | AWS access key id |
-| secretAccessKey  | string   | AWS secret access key |
 
 *_Response_*
 

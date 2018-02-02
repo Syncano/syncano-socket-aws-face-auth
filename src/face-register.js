@@ -2,7 +2,7 @@ import Syncano from 'syncano-server';
 import axios from 'axios';
 import uuidv1 from 'uuid/v1';
 
-import { validateRequired } from './utils/helpers';
+import validateRequired from './utils/helpers';
 import Rekognition from './utils/Rekognition';
 
 export default (ctx) => {

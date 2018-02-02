@@ -3,11 +3,13 @@ import { run } from 'syncano-test';
 import config from './utils/helpers';
 
 describe('create-collection', () => {
-  const { AWS_ACCESS_KEY_ID: accessKeyId, AWS_SECRET_ACCESS_KEY: secretAccessKey } = config;
-  const args = { collectionId: 'testCollection', accessKeyId, secretAccessKey };
+  const meta = {
+    admin: { id: 1, email: 'testEmail@gmail.com' }
+  };
+  const args = { collectionId: 'testCollection' };
 
   it('should create collection if valid collectionId parameter supplied', (done) => {
-    run('create-collection', { args, config })
+    run('create-collection', { args, meta, config })
       .then((res) => {
         assert.propertyVal(res, 'code', 200);
         assert.propertyVal(res, 'mimetype', 'application/json');
@@ -20,7 +22,7 @@ describe('create-collection', () => {
   });
 
   it('should fail if collectionId is already existing', (done) => {
-    run('create-collection', { args, config })
+    run('create-collection', { args, meta, config })
       .then((res) => {
         assert.propertyVal(res, 'code', 400);
         assert.property(res.data, 'message');
@@ -35,7 +37,7 @@ describe('create-collection', () => {
   it('should return message "Validation error(s)" if collectionId is empty',
     (done) => {
       const argsWithoutCollectionId = { ...args, collectionId: '' };
-      run('create-collection', { args: argsWithoutCollectionId, config })
+      run('create-collection', { args: argsWithoutCollectionId, meta, config })
         .then((res) => {
           assert.propertyVal(res, 'code', 400);
           assert.propertyVal(res, 'mimetype', 'application/json');
@@ -47,14 +49,13 @@ describe('create-collection', () => {
         });
     });
 
-  it('should deny access to create collection if invalid `accessKeyId` or `secretAccessKey`',
+  it('should return unauthorized error if admin token not sent with request',
     (done) => {
-      const argsWithoutCollectionId = { ...args, accessKeyId: 'ghh' };
-      run('create-collection', { args: argsWithoutCollectionId, config })
+      run('create-collection', { args, config })
         .then((res) => {
-          assert.propertyVal(res, 'code', 400);
+          assert.propertyVal(res, 'code', 403);
           assert.propertyVal(res.data, 'message',
-            'Provide valid `accessKeyId` and `secretAccessKey` to access endpoint');
+            'You are not authorised for this action');
           done();
         })
         .catch((err) => {
