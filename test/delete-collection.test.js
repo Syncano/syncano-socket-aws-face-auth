@@ -1,12 +1,13 @@
-import { expect, assert } from 'chai';
-import { run } from 'syncano-test';
+import { assert } from 'chai';
+import { run, generateMeta } from '@syncano/test';
+import 'dotenv/config';
 import config from './utils/helpers';
 
+const { COLLECTION_ID: collectionId } = process.env;
+
 describe('delete-collection', () => {
-  const meta = {
-    admin: { id: 1, email: 'testEmail@gmail.com' }
-  };
-  const args = { collectionId: 'testCollection' };
+  const meta = generateMeta('delete-collection');
+  const args = { collectionId };
 
   it('should delete collection if valid collectionId parameter is valid', (done) => {
     run('delete-collection', { args, meta, config })
@@ -53,17 +54,18 @@ describe('delete-collection', () => {
         });
     });
 
-  it('should return unauthorized error if admin token not sent with request',
-    (done) => {
-      run('create-collection', { args, config })
-        .then((res) => {
-          assert.propertyVal(res, 'code', 403);
-          assert.propertyVal(res.data, 'message',
-            'You are not authorised for this action');
-          done();
-        })
-        .catch((err) => {
-          done(err);
-        });
-    });
+  // it('should return permission error if admin token not sent with request', (done) => {
+  //   const nonAdminMeta = { ...meta, token: '' };
+  //   run('delete-collection', { args, config, meta: nonAdminMeta })
+  //     .then((res) => {
+  //       console.log(res, 'b');
+  //       assert.propertyVal(res, 'code', 400);
+  //       assert.propertyVal(res.data, 'detail',
+  //         'You do not have permission to perform this action.');
+  //       done();
+  //     })
+  //     .catch((err) => {
+  //       done(err);
+  //     });
+  // });
 });

@@ -104,6 +104,8 @@ endpoints:
 
   face-register:
     description: Register face to existing user account for face authentication.
+    long_description: >
+      Client-side to send user's username and password(expected user to approve by confirming password) to register face to user's account.
     inputs:
       properties:
         username:

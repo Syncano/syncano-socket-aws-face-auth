@@ -20,15 +20,15 @@
     "lint": "esw src test"
   },
   "dependencies": {
-    "@syncano/cli": "^0.11.0",
-    "@syncano/core": "^0.11.0",
+    "@syncano/cli": "^0.12.1",
+    "@syncano/core": "^0.12.1",
     "aws-sdk": "^2.148.0",
     "axios": "^0.17.1",
     "request": "^2.83.0",
     "uuid": "^3.1.0"
   },
   "devDependencies": {
-    "@syncano/test": "^0.11.0",
+    "@syncano/test": "^0.12.1",
     "babel-cli": "^6.26.0",
     "babel-eslint": "^8.0.2",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
