@@ -1,14 +1,14 @@
-name: aws-face-auth
-description: User face authentication socket with aws rekognition. For basic authentication use 'rest-auth' socket
-version: 0.0.2
+name: aws-face-auth2
+description: User face authentication socket with aws rekognition. For basic authentication use 'user-auth' socket
+version: 0.0.3
+runtime: nodejs_v8
+
 keywords:
   - user
   - face-auth
-  - auth
   - authentication
-  - register
-  - aws
   - rekognition
+
 config:
   AWS_REGION:
     description: AWS region
@@ -42,181 +42,200 @@ classes:
       filter_index: true
 endpoints:
   create-collection:
+    private: true
     description: Creates a collection in an AWS Region (Admin only)
-    parameters:
-      collectionId:
-        type: string
-        description: "ID for the collection that you are creating"
-        example: "SyncanoFaces"
-    response:
-      mimetype: application/json
-      examples:
-        -
-          exit_code: 200
-          description: Success
-          example: |
+    inputs:
+      properties:
+        collectionId:
+          type: string
+          description: ID for the collection that you are creating
+          examples:
+            - SyncanoFaces
+    outputs:
+      success:
+        exit_code: 200
+        description: Success
+        examples:
+          - |
             {
               "collectionArn": "12345",
               "statusCode": 200
             }
-        -
-          exit_code: 400
-          description: Failed
-          example: |
+      fail:
+        exit_code: 400
+        description: Failed
+        examples:
+          - |
             {
               "statusCode": 400,
               "code": "ResourceAlreadyExistsException",
               "message":"A collection with the specified ID already exists."
             }
+
   delete-collection:
+    private: true
     description: Deletes a collection in an AWS Region (Admin only)
-    parameters:
-      collectionId:
-        type: string
-        description: "ID of the collection to delete"
-        example: "SyncanoFaces"
-    response:
-      mimetype: application/json
-      examples:
-        -
-          exit_code: 200
-          description: Success
-          example: |
+    inputs:
+      properties:
+        collectionId:
+          type: string
+          description: ID of the collection to delete
+          examples:
+            - SyncanoFaces
+    outputs:
+      success:
+        exit_code: 200
+        description: Success
+        examples:
+          - |
             {
-            "statusCode": 200
+              "statusCode": 200
             }
-        -
-          exit_code: 400
-          description: Failed
-          example: |
+      fail:
+        exit_code: 400
+        description: Failed
+        examples:
+          - |
             {
               "statusCode": 400,
               "code": "AccessDeniedException",
               "message":"You are not authorized to perform the action."
             }
+
   face-register:
     description: Register face to existing user account for face authentication.
-    long_description: >
-      Client-side to send user's username and password(expected user to approve by confirming password) to register face to user's account.
-    parameters:
-      username:
-        type: string
-        description: "User email"
-        example: "you@domain.com"
-      password:
-        type: string
-        description: "User password"
-        example: ""
-      image:
-        type: string
-        description: "Path to image or an S3 object key"
-      bucketName:
-        type: string
-        description: "Name of s3 bucket. Leave empty if image not on s3 bucket."
-    response:
-      mimetype: application/json
-      examples:
-        -
-          exit_code: 200
-          description: Success
-          example: |
+    inputs:
+      properties:
+        username:
+          type: string
+          description: User email
+          examples:
+            - you@domain.com
+        password:
+          type: string
+          description: User password
+          examples:
+            - strong_password
+        image:
+          type: string
+          description: Path to image or an S3 object key
+        bucketName:
+          type: string
+          description: Name of s3 bucket. Leave empty if image not on s3 bucket.
+    outputs:
+      success:
+        exit_code: 200
+        description: Success
+        examples:
+          - |
             {
               message: "User face registered for face authentication."
             }
-        -
-          exit_code: 400
-          description: Failed
-          example: |
+      fail:
+        exit_code: 400
+        description: Failed
+        examples:
+          - |
             {
               message: "Fail to register face."
             }
+
   face-login:
     description: Login to a user account using face image
-    parameters:
-      image:
-        type: string
-        description: "Path to image or an S3 object key"
-      bucketName:
-        type: string
-        description: "Name of s3 bucket. Leave empty if image not on s3 bucket."
-    response:
-      mimetype: application/json
-      examples:
-        -
-          exit_code: 200
-          description: Success
-          example: |
+    inputs:
+      properties:
+        image:
+          type: string
+          description: Path to image or an S3 object key
+        bucketName:
+          type: string
+          description: Name of s3 bucket. Leave empty if image not on s3 bucket.
+    outputs:
+      success:
+        exit_code: 200
+        description: Success
+        examples:
+          - |
             {
               token: "cb21ff98ac8c7dda8fcd01",
               username: "you@domain.com"
             }
-        -
-          exit_code: 400
-          description: Failed
-          example: |
+      fail:
+        exit_code: 400
+        description: Failed
+        examples:
+          - |
             {
               message: "Authentication fail."
             }
+
   remove-face-auth:
     description: Remove face authentication for particular user
-    parameters:
-      username:
-        type: string
-        description: "Username of user"
-        example: "you@domain.com"
-      token:
-        type: string
-        description: "User token"
-        example: "cb21fac8c7dda8fcd0129b0adb0254dea5c8e"
-      image:
-        type: string
-        description: "Path to image or an S3 object key"
-      bucketName:
-        type: string
-        description: "Name of s3 bucket. Leave empty if image not on s3 bucket."
-    response:
-      mimetype: application/json
-      examples:
-        -
-          exit_code: 200
-          description: Success
-          example: |
+    inputs:
+      properties:
+        username:
+          type: string
+          description: Username of user
+          examples:
+            - you@domain.com
+        token:
+          type: string
+          description: User token
+          examples:
+            - cb21fac8c7dda8fcd0129b0adb0254dea5c8e
+        image:
+          type: string
+          description: Path to image or an S3 object key
+        bucketName:
+          type: string
+          description: Name of s3 bucket. Leave empty if image not on s3 bucket.
+    outputs:
+      success:
+        exit_code: 200
+        description: Success
+        examples:
+          - |
             {
               message: "User account removed from face authentication."
             }
-        -
-          exit_code: 400
-          description: Failed
-          example: |
+      fail:
+        exit_code: 400
+        description: Failed
+        examples:
+          - |
             {
               message: "Face authentication not enabled for user account."
             }
+
   verify-face-auth:
     description: Checks if user face authentication is enabled
-    parameters:
-      username:
-        type: string
-        description: "Username of user"
-        example: "you@domain.com"
-      token:
-        type: string
-        description: "User token"
-        example: "cb21fac8c7dda8fcd0129b0adb0254dea5c8e"
-    response:
-      mimetype: application/json
-      examples:
-        -
-          exit_code: 200
-          description: Success
-          example: |
+    inputs:
+      properties:
+        username:
+          type: string
+          description: Username of user
+          examples:
+            - you@domain.com
+        token:
+          type: string
+          description: User token
+          examples:
+            - cb21fac8c7dda8fcd0129b0adb0254dea5c8e
+    outputs:
+      success:
+        exit_code: 200
+        description: Success
+        examples:
+          - |
             {
               message: "Face auth enabled on user account.",
               is_face_auth: true
             }
-        -
-          exit_code: 200
-          description: Failed
-          example: |
+      fail:
+        exit_code: 400
+        description: Failed
+        examples:
+          - |
             {
               message: "Face auth not enabled on user account.",
               is_face_auth: false

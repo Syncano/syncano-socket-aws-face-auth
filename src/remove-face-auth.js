@@ -1,10 +1,9 @@
-import Syncano from 'syncano-server';
-
+import Syncano from '@syncano/core';
 import validateRequired from './utils/helpers';
 import Rekognition from './utils/Rekognition';
 
 export default (ctx) => {
-  const { response, users } = Syncano(ctx);
+  const { response, users } = new Syncano(ctx);
 
   const { username, token, image, bucketName } = ctx.args;
   const { COLLECTION_ID: collectionId, FACE_MATCH_THRESHOLD: faceMatchThreshold } = ctx.config;
@@ -13,9 +12,8 @@ export default (ctx) => {
 
   try {
     validateRequired({ username, token, image });
-  } catch (err) {
-    const { customMessage, details } = err;
-    return response.json({ message: customMessage, details }, 400);
+  } catch ({ ...errors }) {
+    return response.json(errors, 400);
   }
 
   const awsRekognitionClass = new Rekognition(ctx.config);
@@ -77,9 +75,11 @@ export default (ctx) => {
   };
 
   const updateUserSchema = () => {
-    users.where('username', username)
+    return users.where('username', username)
       .update({ face_auth: false, external_image_id: '' })
-      .then(() => response.json({ message: 'User account removed from face authentication.' }))
+      .then(() => {
+        return response.json({ message: 'User account removed from face authentication.' });
+      })
       .catch((err) => {
         const message = (err.data) ? err.data : err.message;
         return Promise.reject({ message, statusCode: 400 });

@@ -1,24 +1,16 @@
-import Syncano from 'syncano-server';
+import Syncano from '@syncano/core';
 import axios from 'axios';
 import uuidv1 from 'uuid/v1';
-
 import validateRequired from './utils/helpers';
 import Rekognition from './utils/Rekognition';
 
-export default (ctx) => {
-  const { users, response } = Syncano(ctx);
+export default async (ctx) => {
+  const { users, response } = new Syncano(ctx);
 
   const { username, password, image, bucketName } = ctx.args;
   const { COLLECTION_ID: collectionId, FACE_MATCH_THRESHOLD: faceMatchThreshold } = ctx.config;
 
   const s3bucket = (!bucketName || bucketName.trim() === '') ? null : bucketName;
-
-  try {
-    validateRequired({ username, password, image });
-  } catch (err) {
-    const { customMessage, details } = err;
-    return response.json({ message: customMessage, details }, 400);
-  }
 
   const AUTH_URL = `https://api.syncano.io/v2/instances/${ctx.meta.instance}/users/auth/`;
 
@@ -29,21 +21,24 @@ export default (ctx) => {
    * @param {object} data
    * @returns {Promise.<*>} promise
    */
-  const searchUserFace = ({ data }) => {
-    return awsRekognitionClass.searchFacesByImage(collectionId, image, s3bucket, faceMatchThreshold)
-      .then((res) => {
-        if (res.FaceMatches.length === 0) {
-          return data;
-        }
-        // Check if face match not for current user
-        if (res.FaceMatches[0].Face.ExternalImageId !== data.external_image_id) {
-          return Promise.reject({
-            message: 'Image tied to another user account.', statusCode: 400
-          });
-        }
+  const searchUserFace = async ({ data }) => {
+    try {
+      const result = await awsRekognitionClass
+        .searchFacesByImage(collectionId, image, s3bucket, faceMatchThreshold);
+
+      if (result.FaceMatches.length === 0) {
         return data;
-      })
-      .catch(err => Promise.reject({ message: err.message, statusCode: 400 }));
+      }
+      // Check if face match not for current user
+      if (result.FaceMatches[0].Face.ExternalImageId !== data.external_image_id) {
+        return Promise.reject({
+          message: 'Image tied to another user account.', statusCode: 400
+        });
+      }
+      return data;
+    } catch (err) {
+      return Promise.reject({ message: err.message, statusCode: 400 });
+    }
   };
 
   /**
@@ -51,12 +46,16 @@ export default (ctx) => {
    * @param {object} data
    * @returns {Promise.<*>}
    */
-  const indexUserFace = (data) => {
-    const externalImageId = (data.external_image_id === null || data.external_image_id === '')
-      ? uuidv1() : data.external_image_id;
-    return awsRekognitionClass.indexFaces(collectionId, image, externalImageId, s3bucket)
-      .then(res => res)
-      .catch(err => Promise.reject({ message: err.message, statusCode: 400 }));
+  const indexUserFace = async (data) => {
+    try {
+      const externalImageId = (data.external_image_id === null || data.external_image_id === '')
+        ? uuidv1() : data.external_image_id;
+
+      return await awsRekognitionClass
+        .indexFaces(collectionId, image, externalImageId, s3bucket);
+    } catch (err) {
+      return Promise.reject({ message: err.message, statusCode: 400 });
+    }
   };
 
   /**
@@ -65,12 +64,14 @@ export default (ctx) => {
    * @param {string} message
    * @returns {Promise.<*>}
    */
-  const deleteFaces = (res, message) => {
-    const faceIds = res.FaceRecords.map(record => record.Face.FaceId);
-    return awsRekognitionClass.deleteFaces(collectionId, faceIds)
-      .then(() => {
-        return Promise.reject({ message, statusCode: 400 });
-      }).catch(err => Promise.reject({ message: err.message, statusCode: 400 }));
+  const deleteFaces = async (res, message) => {
+    try {
+      const faceIds = res.FaceRecords.map(record => record.Face.FaceId);
+      await awsRekognitionClass.deleteFaces(collectionId, faceIds);
+      return Promise.reject({ message, statusCode: 400 });
+    } catch (err) {
+      return Promise.reject({ message: err.message, statusCode: 400 });
+    }
   };
 
   /**
@@ -78,7 +79,7 @@ export default (ctx) => {
    * @param {object} res
    * @returns {*} promise
    */
-  const handleIndexImage = (res) => {
+  const handleIndexImage = async (res) => {
     if (res.FaceRecords.length === 1) {
       return res;
     } else if (res.FaceRecords.length > 1) {
@@ -88,32 +89,35 @@ export default (ctx) => {
     return Promise.reject({ message: 'Fail to register face.', statusCode: 400 });
   };
 
-  const updateUserSchema = (res) => {
-    users.where('username', username)
-      .update({ face_auth: true, external_image_id: res.FaceRecords[0].Face.ExternalImageId })
-      .then(() => {
-        return response.json({ message: 'User face registered for face authentication.' });
-      })
-      .catch((err) => {
-        const message = (err.data) ? err.data : err.message;
-        return deleteFaces(res, message);
-      });
+  const updateUserSchema = async (res) => {
+    try {
+      await users.where('username', username)
+        .update({ face_auth: true, external_image_id: res.FaceRecords[0].Face.ExternalImageId });
+      return response.json({ message: 'User face registered for face authentication.' });
+    } catch (err) {
+      const message = (err.data) ? err.data : err.message;
+      return deleteFaces(res, message);
+    }
   };
 
-  axios.post(AUTH_URL, { username, password },
-    {
-      headers: { 'Content-Type': 'application/json', 'X-API-KEY': ctx.meta.token }
-    })
-    .then(searchUserFace)
-    .then(indexUserFace)
-    .then(handleIndexImage)
-    .then(updateUserSchema)
-    .catch((err) => {
-      if (err.statusCode) {
-        return response.json(err, err.statusCode);
-      }
-      return response.json(
-        { message: 'Username or password does not match any user account.' }, 401
-      );
-    });
+  try {
+    validateRequired({ username, password, image });
+
+    const userDetails = await axios.post(AUTH_URL, { username, password },
+      {
+        headers: { 'Content-Type': 'application/json', 'X-API-KEY': ctx.meta.token }
+      });
+    const searchUserFaceResponse = await searchUserFace(userDetails);
+    const indexUserFaceResponse = await indexUserFace(searchUserFaceResponse);
+    const handleIndexImageResponse = await handleIndexImage(indexUserFaceResponse);
+    await updateUserSchema(handleIndexImageResponse);
+    return response.json({ message: 'User face registered for face authentication.' });
+  } catch (err) {
+    if (err.statusCode) {
+      return response.json(err, err.statusCode);
+    }
+    return response.json(
+      { message: 'Username or password does not match any user account.' }, 401
+    );
+  }
 };

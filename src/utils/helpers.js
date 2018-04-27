@@ -7,7 +7,7 @@ const checkRequired = (val) => {
   return str.length > 0;
 };
 
-const validateRequired = (obj, customMessage = 'Validation error(s)', statusCode = 400) => {
+const validateRequired = (obj, message = 'Validation error(s)') => {
   const validateMessages = {};
   Object.keys(obj).forEach((key) => {
     if (!checkRequired(obj[key])) {
@@ -16,7 +16,7 @@ const validateRequired = (obj, customMessage = 'Validation error(s)', statusCode
   });
 
   if (Object.keys(validateMessages).length > 0) {
-    throw ({ customMessage, details: validateMessages, statusCode });
+    throw ({ message, details: validateMessages, statusCode: 400 });
   }
 };
 
