@@ -10,62 +10,24 @@ describe('create-collection', () => {
   const meta = generateMeta('create-collection');
   const args = { collectionId };
 
-  it('should create collection if valid collectionId parameter supplied', (done) => {
-    run('create-collection', { args, meta, config })
-      .then((res) => {
-        assert.propertyVal(res, 'code', 200);
-        assert.propertyVal(res, 'mimetype', 'application/json');
-        assert.propertyVal(res.data, 'statusCode', 200);
-        done();
-      })
-      .catch((err) => {
-        done(err);
-      });
+  it('should create collection if valid collectionId parameter supplied', async () => {
+    const { data, code } = await run('create-collection', { args, meta, config });
+    assert.strictEqual(code, 200);
+    assert.propertyVal(data, 'statusCode', 200);
   });
 
-  it('should fail if collectionId is already existing', (done) => {
-    run('create-collection', { args, meta, config })
-      .then((res) => {
-        assert.propertyVal(res, 'code', 400);
-        assert.property(res.data, 'message');
-        assert.propertyVal(res.data, 'code', 'ResourceAlreadyExistsException');
-        done();
-      })
-      .catch((err) => {
-        done(err);
-      });
+  it('should fail if collectionId is already existing', async () => {
+    const { data, code } = await run('create-collection', { args, meta, config });
+    assert.strictEqual(code, 400);
+    assert.property(data, 'message');
+    assert.propertyVal(data, 'code', 'ResourceAlreadyExistsException');
   });
 
-  it('should return message "Validation error(s)" if collectionId is empty',
-    (done) => {
-      const argsWithoutCollectionId = { ...args, collectionId: '' };
-      run('create-collection', { args: argsWithoutCollectionId, meta, config })
-        .then((res) => {
-          assert.propertyVal(res, 'code', 400);
-          assert.propertyVal(res, 'mimetype', 'application/json');
-          assert.propertyVal(res.data, 'message', 'Validation error(s)');
-          done();
-        })
-        .catch((err) => {
-          done(err);
-        });
-    });
-
-  // it('should return permission error if admin token not sent with request',
-  //   (done) => {
-  //     const nonAdminMeta = { ...meta, token: null };
-  //     console.log(nonAdminMeta, 'iiiiii');
-  //     console.log(meta, '>>>>>>>');
-  //     run('create-collection', { args, config })
-  //       .then((res) => {
-  //         console.log(res, 'a');
-  //         assert.propertyVal(res, 'code', 400);
-  //         assert.propertyVal(res.data, 'detail',
-  //           'You do not have permission to perform this action.');
-  //         done();
-  //       })
-  //       .catch((err) => {
-  //         done(err);
-  //       });
-  //   });
+  it('should return message "Validation error(s)" if collectionId is empty', async () => {
+    const argsWithoutCollectionId = { ...args, collectionId: '' };
+    const { data, code } = await run('create-collection', { args: argsWithoutCollectionId, meta, config });
+    assert.strictEqual(code, 400);
+    assert.property(data, 'message');
+    assert.propertyVal(data, 'message', 'Validation error(s)');
+  });
 });

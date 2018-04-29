@@ -52,8 +52,7 @@ describe('remove-face-auth', () => {
         image: userImage,
         bucketName,
       };
-      const { data, code } =
-        await run('remove-face-auth', { args: argsFaceNotRegistered, meta, config });
+      const { data, code } = await run('remove-face-auth', { args: argsFaceNotRegistered, meta, config });
       assert.strictEqual(code, 400);
       assert.propertyVal(data, 'message', 'Face authentication not enabled for user account.');
     });
@@ -79,8 +78,7 @@ describe('remove-face-auth', () => {
           image: userImage,
           bucketName,
         };
-        const { data, code } =
-          await run('remove-face-auth', { args: argsFaceRegistered, meta, config });
+        const { data, code } = await run('remove-face-auth', { args: argsFaceRegistered, meta, config });
         assert.strictEqual(code, 200);
         assert.propertyVal(data, 'message', 'User account removed from face authentication.');
       });
@@ -95,8 +93,7 @@ describe('remove-face-auth', () => {
           image: userImage,
           bucketName,
         };
-        const { data, code } =
-          await run('remove-face-auth', { args: argsInvalidUsername, meta, config });
+        const { data, code } = await run('remove-face-auth', { args: argsInvalidUsername, meta, config });
         assert.strictEqual(code, 401);
         assert.propertyVal(data, 'message', 'Given credentials does not match any user account.');
       });
@@ -117,8 +114,7 @@ describe('remove-face-auth', () => {
 
     it('should return message "Validation error(s)" if username parameter is empty', async () => {
       const argsValidation = { username: '', token: 'tokenString' };
-      const { data, code } =
-        await run('remove-face-auth', { args: argsValidation, meta, config });
+      const { data, code } = await run('remove-face-auth', { args: argsValidation, meta, config });
       assert.strictEqual(code, 400);
       assert.propertyVal(data, 'message', 'Validation error(s)');
     });

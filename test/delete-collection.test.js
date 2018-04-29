@@ -9,50 +9,28 @@ describe('delete-collection', () => {
   const meta = generateMeta('delete-collection');
   const args = { collectionId };
 
-  it('should delete collection if valid collectionId parameter is valid', (done) => {
-    run('delete-collection', { args, meta, config })
-      .then((res) => {
-        assert.propertyVal(res, 'code', 200);
-        assert.propertyVal(res, 'mimetype', 'application/json');
-        assert.propertyVal(res.data, 'statusCode', 200);
-        done();
-      })
-      .catch((err) => {
-        done(err);
-      });
+  it('should delete collection if valid collectionId parameter is valid', async () => {
+    const { data, code } = await run('delete-collection', { args, meta, config });
+    assert.strictEqual(code, 200);
+    assert.propertyVal(data, 'statusCode', 200);
   });
 
-  it('should return "ResourceNotFoundException" error if collectionId does not exist', (done) => {
+  it('should return "ResourceNotFoundException" error if collectionId does not exist', async () => {
     const argsWithNonExistingName = { ...args, collectionId: 'nonExistingName' };
 
-    run('delete-collection', { args: argsWithNonExistingName, meta, config })
-      .then((res) => {
-        assert.propertyVal(res, 'code', 400);
-        assert.propertyVal(res, 'mimetype', 'application/json');
-        assert.propertyVal(res.data, 'code', 'ResourceNotFoundException');
-        assert.propertyVal(res.data, 'message',
-          'The collection id: nonExistingName does not exist');
-        done();
-      })
-      .catch((err) => {
-        done(err);
-      });
+    const { data, code } = await run('delete-collection', { args: argsWithNonExistingName, meta, config });
+    assert.strictEqual(code, 400);
+    assert.property(data, 'message');
+    assert.propertyVal(data, 'message', 'The collection id: nonExistingName does not exist');
   });
 
-  it('should return message "Validation error(s)" if collectionId is empty',
-    (done) => {
-      const argsWithoutCollectionId = { ...args, collectionId: '' };
-      run('delete-collection', { args: argsWithoutCollectionId, meta, config })
-        .then((res) => {
-          assert.propertyVal(res, 'code', 400);
-          assert.propertyVal(res, 'mimetype', 'application/json');
-          assert.propertyVal(res.data, 'message', 'Validation error(s)');
-          done();
-        })
-        .catch((err) => {
-          done(err);
-        });
-    });
+  it('should return message "Validation error(s)" if collectionId is empty', async () => {
+    const argsWithoutCollectionId = { ...args, collectionId: '' };
+
+    const { data, code } = await run('delete-collection', { args: argsWithoutCollectionId, meta, config });
+    assert.strictEqual(code, 400);
+    assert.propertyVal(data, 'message', 'Validation error(s)');
+  });
 
   // it('should return permission error if admin token not sent with request', (done) => {
   //   const nonAdminMeta = { ...meta, token: '' };
