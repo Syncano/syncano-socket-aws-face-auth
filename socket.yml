@@ -1,4 +1,4 @@
-name: aws-face-auth2
+name: aws-face-auth
 description: User face authentication socket with aws rekognition. For basic authentication use 'user-auth' socket
 version: 0.0.3
 runtime: nodejs_v8
@@ -120,7 +120,9 @@ endpoints:
             - strong_password
         image:
           type: string
-          description: Path to image or an S3 object key
+          description: A base64-encoded bytes or an S3 object key
+          long_description: >
+            When sending a base64-encoded bytes take of the string sample 'data:image/png;base64,' from beginning of encoded string.
         bucketName:
           type: string
           description: Name of s3 bucket. Leave empty if image not on s3 bucket.
@@ -148,7 +150,9 @@ endpoints:
       properties:
         image:
           type: string
-          description: Path to image or an S3 object key
+          description: A base64-encoded bytes or an S3 object key
+          long_description: >
+            When sending a base64-encoded bytes take of the string sample 'data:image/png;base64,' from beginning of encoded string.
         bucketName:
           type: string
           description: Name of s3 bucket. Leave empty if image not on s3 bucket.
@@ -187,7 +191,9 @@ endpoints:
             - cb21fac8c7dda8fcd0129b0adb0254dea5c8e
         image:
           type: string
-          description: Path to image or an S3 object key
+          description: A base64-encoded bytes or an S3 object key
+          long_description: >
+            When sending a base64-encoded bytes take of the string sample 'data:image/png;base64,' from beginning of encoded string.
         bucketName:
           type: string
           description: Name of s3 bucket. Leave empty if image not on s3 bucket.
