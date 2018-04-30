@@ -1,35 +1,26 @@
-import Syncano from 'syncano-server';
+import Syncano from '@syncano/core';
+import validateRequired from './utils/helpers';
 
-export default (ctx) => {
-  const { response, users } = Syncano(ctx);
-
+export default async (ctx) => {
+  const { response, users } = new Syncano(ctx);
   const { username, token } = ctx.args;
 
-  /**
-   * Check if face auth is enabled in user account
-   * @param {object} data
-   * @returns {*} response
-   */
-  const verifyUserFaceAuthRegistered = (data) => {
-    if (data.user_key !== token) {
-      return response.json({
-        message: 'Given credentials does not match any user account.'
-      }, 401);
-    } else if (!data.face_auth) {
-      return response.json({
-        message: 'Face auth not enabled on user account.', is_face_auth: false
-      });
+  try {
+    validateRequired({ username, token });
+
+    const { user_key, face_auth } = await users.where('username', username).firstOrFail();
+
+    if (user_key !== token) {
+      return response.json({ message: 'Given credentials do not match any user account.' }, 401);
+    } else if (!face_auth) {
+      return response.json({ message: 'Face auth not enabled on user account.', is_face_auth: false });
     }
 
-    return response.json({
-      message: 'Face auth enabled on user account.', is_face_auth: true
-    });
-  };
-
-  return users.where('username', username)
-    .firstOrFail()
-    .then(verifyUserFaceAuthRegistered)
-    .catch(() => {
-      return response.json({ message: 'Given credentials does not match any user account.' }, 401);
-    });
+    return response.json({ message: 'Face auth enabled on user account.', is_face_auth: true });
+  } catch (err) {
+    if (err.statusCode) {
+      return response.json(err, err.statusCode);
+    }
+    return response.json({ message: 'Given credentials do not match any user account.' }, 401);
+  }
 };

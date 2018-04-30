@@ -1,56 +1,34 @@
-import { expect, assert } from 'chai';
-import { run } from 'syncano-test';
+import { assert } from 'chai';
+import { run, generateMeta } from '@syncano/test';
+import 'dotenv/config';
 import config from './utils/helpers';
 
+const { COLLECTION_ID: collectionId } = process.env;
+
 describe('delete-collection', () => {
-  const args = { collectionId: 'collectionTest1' };
+  const meta = generateMeta('delete-collection');
+  const args = { collectionId };
 
-  it('with valid collection name', (done) => {
-    run('delete-collection', { args, config })
-      .then((res) => {
-        assert.propertyVal(res, 'code', 200);
-        assert.propertyVal(res, 'mimetype', 'application/json');
-        assert.propertyVal(res.data, 'statusCode', 200);
-        done();
-      })
-      .catch((err) => {
-        done(err);
-      });
+  it('should delete collection if valid collectionId parameter is valid', async () => {
+    const { data, code } = await run('delete-collection', { args, meta, config });
+    assert.strictEqual(code, 200);
+    assert.propertyVal(data, 'statusCode', 200);
   });
 
-  it('with collection name that does not exist', (done) => {
-    const argsWithNonExistingName = { collectionId: 'nonExistingName' };
+  it('should return "ResourceNotFoundException" error if collectionId does not exist', async () => {
+    const argsWithNonExistingName = { ...args, collectionId: 'nonExistingName' };
 
-    run('delete-collection', { args: argsWithNonExistingName, config })
-      .then((res) => {
-        assert.propertyVal(res, 'code', 400);
-        assert.propertyVal(res, 'mimetype', 'application/json');
-        assert.propertyVal(res.data, 'code', 'ResourceNotFoundException');
-        assert.propertyVal(
-          res.data,
-          'message',
-          'The collection id: nonExistingName does not exist'
-        );
-        done();
-      })
-      .catch((err) => {
-        done(err);
-      });
+    const { data, code } = await run('delete-collection', { args: argsWithNonExistingName, meta, config });
+    assert.strictEqual(code, 400);
+    assert.property(data, 'message');
+    assert.propertyVal(data, 'message', 'The collection id: nonExistingName does not exist');
   });
 
-  it('without collection name', (done) => {
-    const argsWithoutData = {};
+  it('should return message "Validation error(s)" if collectionId is empty', async () => {
+    const argsWithoutCollectionId = { ...args, collectionId: '' };
 
-    run('delete-collection', { args: argsWithoutData, config })
-      .then((res) => {
-        assert.propertyVal(res, 'code', 400);
-        assert.propertyVal(res, 'mimetype', 'application/json');
-        assert.propertyVal(res.data, 'code', 'MissingRequiredParameter');
-        assert.propertyVal(res.data, 'message', 'Missing required key \'CollectionId\' in params');
-        done();
-      })
-      .catch((err) => {
-        done(err);
-      });
+    const { data, code } = await run('delete-collection', { args: argsWithoutCollectionId, meta, config });
+    assert.strictEqual(code, 400);
+    assert.propertyVal(data, 'message', 'Validation error(s)');
   });
 });

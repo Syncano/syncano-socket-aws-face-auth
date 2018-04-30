@@ -1,36 +1,33 @@
-import { expect, assert } from 'chai';
-import { run } from 'syncano-test';
+import { assert } from 'chai';
+import { describe, it } from 'mocha';
+import { run, generateMeta } from '@syncano/test';
+import 'dotenv/config';
 import config from './utils/helpers';
 
-describe('create-collection', () => {
-  const args = { collectionId: 'collectionTest1' };
+const { COLLECTION_ID: collectionId } = process.env;
 
-  it('with valid collection name', (done) => {
-    run('create-collection', { args, config })
-      .then((res) => {
-        assert.propertyVal(res, 'code', 200);
-        assert.propertyVal(res, 'mimetype', 'application/json');
-        assert.propertyVal(res.data, 'statusCode', 200);
-        done();
-      })
-      .catch((err) => {
-        done(err);
-      });
+describe('create-collection', () => {
+  const meta = generateMeta('create-collection');
+  const args = { collectionId };
+
+  it('should create collection if valid collectionId parameter supplied', async () => {
+    const { data, code } = await run('create-collection', { args, meta, config });
+    assert.strictEqual(code, 200);
+    assert.propertyVal(data, 'statusCode', 200);
   });
 
-  it('without collection name', (done) => {
-    const argsWithoutData = {};
+  it('should fail if collectionId is already existing', async () => {
+    const { data, code } = await run('create-collection', { args, meta, config });
+    assert.strictEqual(code, 400);
+    assert.property(data, 'message');
+    assert.propertyVal(data, 'code', 'ResourceAlreadyExistsException');
+  });
 
-    run('create-collection', { args: argsWithoutData, config })
-      .then((res) => {
-        assert.propertyVal(res, 'code', 400);
-        assert.propertyVal(res, 'mimetype', 'application/json');
-        assert.propertyVal(res.data, 'code', 'MissingRequiredParameter');
-        assert.propertyVal(res.data, 'message', 'Missing required key \'CollectionId\' in params');
-        done();
-      })
-      .catch((err) => {
-        done(err);
-      });
+  it('should return message "Validation error(s)" if collectionId is empty', async () => {
+    const argsWithoutCollectionId = { ...args, collectionId: '' };
+    const { data, code } = await run('create-collection', { args: argsWithoutCollectionId, meta, config });
+    assert.strictEqual(code, 400);
+    assert.property(data, 'message');
+    assert.propertyVal(data, 'message', 'Validation error(s)');
   });
 });

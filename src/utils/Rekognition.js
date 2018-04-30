@@ -41,35 +41,6 @@ class Rekognition {
   }
 
   /**
-   * Converts URL containing an image and converts it to bytes
-   * @param {string} imageUrl
-   * @returns {Object}
-   */
-  static convertImageToBytes(imageUrl) {
-    return new Promise((resolve, reject) => {
-      const file = fs.createWriteStream('image.png');
-      request.get(imageUrl).on('response', (response) => {
-        if (
-          response.headers['content-type'] === 'image/jpeg' ||
-          response.headers['content-type'] === 'image/png'
-        ) {
-          return response.pipe(file).on('close', () => {
-            if (fs.existsSync('image.png')) {
-              try {
-                return resolve(fs.readFileSync('image.png'));
-              } catch (err) {
-                return reject(err);
-              }
-            }
-            return reject(new Error());
-          });
-        }
-        return reject(new Error());
-      });
-    });
-  }
-
-  /**
    * Utility to get image params for s3 object or Bytes
    *
    * @param {string} image
@@ -87,7 +58,7 @@ class Rekognition {
     }
     try {
       return {
-        Bytes: await Rekognition.convertImageToBytes(image)
+        Bytes: await Buffer.from(image, 'base64')
       };
     } catch (err) {
       return { Bytes: [] };
@@ -119,15 +90,6 @@ class Rekognition {
     };
 
     return this.doCall('deleteCollection', params);
-  }
-
-  /**
-   * List collections
-   *
-   * @returns {Promise}
-   */
-  listCollections() {
-    return this.doCall('listCollections', {});
   }
 
   /**

@@ -1,23 +1,17 @@
-import Syncano from 'syncano-server';
-
+import Syncano from '@syncano/core';
+import validateRequired from './utils/helpers';
 import Rekognition from './utils/Rekognition';
 
-export default (ctx) => {
-  const { response } = Syncano(ctx);
+export default async (ctx) => {
+  const { response } = new Syncano(ctx);
+  const { collectionId } = ctx.args;
+  try {
+    validateRequired({ collectionId });
 
-  const awsRekognitionClass = new Rekognition(ctx.config);
-
-  return awsRekognitionClass.deleteCollection(ctx.args.collectionId)
-    .then((res) => {
-      return response.json({
-        statusCode: res.StatusCode
-      });
-    })
-    .catch((err) => {
-      return response.json({
-        statusCode: err.statusCode,
-        code: err.code,
-        message: err.message
-      }, 400);
-    });
+    const awsRekognitionClass = new Rekognition(ctx.config);
+    const { StatusCode: statusCode } = await awsRekognitionClass.deleteCollection(collectionId);
+    return response.json({ statusCode });
+  } catch (errors) {
+    return response.json(errors, 400);
+  }
 };

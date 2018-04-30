@@ -12,9 +12,9 @@ syncano-cli add aws-face-auth
 ### Dependencies
 * **rest-auth socket**
     
-    Since there can be no authentication without first registering to a system, it is important to use the `rest-auth` socket for basic registration.
+    Since there can be no authentication without first registering to a system, it is important to use the `user-auth` socket for basic registration.
 
-    [Link to rest-auth socket documentation](https://syncano.io/#/sockets/two-factor-auth)
+    [Link to user-auth socket documentation](https://syncano.io/#/sockets/user-auth)
 
 ### Socket Documentation
 [Link to aws-face-auth socket documentation](https://syncano.io/#/sockets/aws-face-auth)
@@ -24,7 +24,7 @@ syncano-cli add aws-face-auth
 
 #### create-collection
 
-This endpoint creates a collection where face indexes will be stored in AWS Rekognition.
+This endpoint creates a collection where face indexes will be stored in AWS Rekognition (Admin only).
 
 *_Parameters_*
 
@@ -43,7 +43,7 @@ This endpoint creates a collection where face indexes will be stored in AWS Reko
 
 #### delete-collection
 
-This endpoint deletes a collection in AWS Rekognition.
+This endpoint deletes a collection in AWS Rekognition (Admin only).
 
 *_Parameters_*
 
@@ -72,8 +72,7 @@ User required to input password as extra check when registering face to account.
 | ------------- |-----------| ------------| ---------
 | username      | string   | User email   | you@domain.com
 | password     | string    | User password | user-password
-| collectionId | string    | Id collection to keep indexed image | SyncanoFaces
-| image        | string    | Path to image or an S3 object key | image.jpg
+| image        | string    | A base64-encoded bytes or an S3 object key (When sending a base64-encoded bytes take of the string sample 'data:image/png;base64,' from beginning of encoded string.) | image.jpg
 | bucketName   | string    | Name of s3 bucket. Leave empty if image not on s3 bucket  | s3-bucket.
 
 *_Response_*
@@ -93,8 +92,7 @@ This endpoint login a user using face image.
 
 | Name          | Type      | Description  | Example
 | ------------- |-----------| ------------| ---------
-| collectionId | string    | Id collection to keep indexed image | SyncanoFaces
-| image        | string    | Path to image or an S3 object key | image.jpg
+| image        | string    | A base64-encoded bytes or an S3 object key (When sending a base64-encoded bytes take of the string sample 'data:image/png;base64,' from beginning of encoded string.) | image.jpg
 | bucketName   | string    | Name of s3 bucket. Leave empty if image not on s3 bucket  | s3-bucket.
 
 *_Response_*
@@ -117,8 +115,7 @@ This endpoint removes face authentication on user account
 | ------------- |-----------| ------------| ---------
 | username      | string   | User email   | you@domain.com
 | token     | string    | User token | cb21fac8c7dda8fcd0129b0adb0254dea5c8e
-| collectionId | string    | Id collection to keep indexed image | SyncanoFaces
-| image        | string    | Path to image or an S3 object key | image.jpg
+| image        | string    | A base64-encoded bytes or an S3 object key (When sending a base64-encoded bytes take of the string sample 'data:image/png;base64,' from beginning of encoded string.) | image.jpg
 | bucketName   | string    | Name of s3 bucket. Leave empty if image not on s3 bucket  | s3-bucket.
 
 
