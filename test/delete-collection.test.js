@@ -31,19 +31,4 @@ describe('delete-collection', () => {
     assert.strictEqual(code, 400);
     assert.propertyVal(data, 'message', 'Validation error(s)');
   });
-
-  // it('should return permission error if admin token not sent with request', (done) => {
-  //   const nonAdminMeta = { ...meta, token: '' };
-  //   run('delete-collection', { args, config, meta: nonAdminMeta })
-  //     .then((res) => {
-  //       console.log(res, 'b');
-  //       assert.propertyVal(res, 'code', 400);
-  //       assert.propertyVal(res.data, 'detail',
-  //         'You do not have permission to perform this action.');
-  //       done();
-  //     })
-  //     .catch((err) => {
-  //       done(err);
-  //     });
-  // });
 });
