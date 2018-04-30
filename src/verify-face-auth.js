@@ -8,11 +8,11 @@ export default async (ctx) => {
   try {
     validateRequired({ username, token });
 
-    const result = await users.where('username', username).firstOrFail();
+    const { user_key, face_auth } = await users.where('username', username).firstOrFail();
 
-    if (result.user_key !== token) {
-      return response.json({ message: 'Given credentials does not match any user account.' }, 401);
-    } else if (!result.face_auth) {
+    if (user_key !== token) {
+      return response.json({ message: 'Given credentials do not match any user account.' }, 401);
+    } else if (!face_auth) {
       return response.json({ message: 'Face auth not enabled on user account.', is_face_auth: false });
     }
 
@@ -21,6 +21,6 @@ export default async (ctx) => {
     if (err.statusCode) {
       return response.json(err, err.statusCode);
     }
-    return response.json({ message: 'Given credentials does not match any user account.' }, 401);
+    return response.json({ message: 'Given credentials do not match any user account.' }, 401);
   }
 };

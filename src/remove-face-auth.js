@@ -31,16 +31,13 @@ export default async (ctx) => {
       return response.json({ message: 'Face authentication not enabled for user account.' }, 400);
     }
 
-    const searchFacesResult = await awsRekognitionClass
+    const { FaceMatches } = await awsRekognitionClass
       .searchFacesByImage(collectionId, image, s3bucket, faceMatchThreshold);
 
-    if (searchFacesResult.FaceMatches.length > 0
-      && searchFacesResult.FaceMatches[0].Face.ExternalImageId === external_image_id) {
+    if (FaceMatches.length > 0 && FaceMatches[0].Face.ExternalImageId === external_image_id) {
       // delete the user faces index
-      if (searchFacesResult.FaceMatches.length > 0) {
-        const faceIds = searchFacesResult.FaceMatches.map(record => record.Face.FaceId);
-        await awsRekognitionClass.deleteFaces(collectionId, faceIds);
-      }
+      const faceIds = FaceMatches.map(record => record.Face.FaceId);
+      await awsRekognitionClass.deleteFaces(collectionId, faceIds);
       await updateUserSchema();
       return response.json({ message: 'User account removed from face authentication.' });
     }

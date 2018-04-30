@@ -63,7 +63,7 @@ describe('verify-face-auth', () => {
   });
 
   describe('with invalid user credentials', () => {
-    it('should show "Given credentials does not match any user account." if username not existing',
+    it('should show "Given credentials do not match any user account." if username not existing',
       async () => {
         const argsInvalidUsername = {
           username: 'you22lllll@gmail.com', token: '11e118aa4eefeff12ab6d1'
@@ -71,10 +71,10 @@ describe('verify-face-auth', () => {
         const { data, code } =
           await run('verify-face-auth', { args: argsInvalidUsername, meta, config });
         assert.strictEqual(code, 401);
-        assert.propertyVal(data, 'message', 'Given credentials does not match any user account.');
+        assert.propertyVal(data, 'message', 'Given credentials do not match any user account.');
       });
 
-    it('should show "Given credentials does not match any user account." if token not for user',
+    it('should show "Given credentials do not match any user account." if token not for user',
       async () => {
         const argsInvalidUserToken = {
           username: firstUserEmail, token: '11e118aa4ee12ab6d18a6de930787'
@@ -82,7 +82,7 @@ describe('verify-face-auth', () => {
         const { data, code } =
           await run('verify-face-auth', { args: argsInvalidUserToken, meta, config });
         assert.strictEqual(code, 401);
-        assert.propertyVal(data, 'message', 'Given credentials does not match any user account.');
+        assert.propertyVal(data, 'message', 'Given credentials do not match any user account.');
       });
 
 

@@ -14,19 +14,20 @@ export default async (ctx) => {
   try {
     validateRequired({ image });
 
-    const result = await awsRekognitionClass.searchFacesByImage(collectionId, image, s3Bucket, faceMatchThreshold);
+    const { FaceMatches } = await awsRekognitionClass
+      .searchFacesByImage(collectionId, image, s3Bucket, faceMatchThreshold);
 
-    if (result.FaceMatches.length === 0) {
+    if (FaceMatches.length === 0) {
       return response.json({ message: 'User does not exist' }, 401);
     }
 
     const { user_key, username } =
-      await users.where('external_image_id', result.FaceMatches[0].Face.ExternalImageId).firstOrFail();
+      await users.where('external_image_id', FaceMatches[0].Face.ExternalImageId).firstOrFail();
     return response.json({ token: user_key, username });
   } catch (err) {
     if (err.statusCode || err.code) {
       return response.json(err, err.statusCode || 400);
     }
-    return response.json({ message: 'Authentication fail.' }, 401);
+    return response.json({ message: 'Authentication failed.' }, 401);
   }
 };

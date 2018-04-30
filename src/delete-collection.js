@@ -9,9 +9,9 @@ export default async (ctx) => {
     validateRequired({ collectionId });
 
     const awsRekognitionClass = new Rekognition(ctx.config);
-    const result = await awsRekognitionClass.deleteCollection(collectionId);
-    return response.json({ statusCode: result.StatusCode });
-  } catch ({ ...errors }) {
+    const { StatusCode: statusCode } = await awsRekognitionClass.deleteCollection(collectionId);
+    return response.json({ statusCode });
+  } catch (errors) {
     return response.json(errors, 400);
   }
 };
